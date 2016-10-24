@@ -1,0 +1,16 @@
+version: "2"
+services:
+ tokenizer:
+   container_name: tokenizer
+   image: librairy/annotator-tokenizer:latest
+   external_links:
+     - column-db
+     - document-db
+     - graph-db
+     - event-bus
+   networks:
+     - "lnet"
+networks:
+  lnet:
+    external:
+      name: distribution_lnet
