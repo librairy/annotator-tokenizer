@@ -11,7 +11,7 @@
 
 	<groupId>org.librairy</groupId>
     <artifactId>librairy-annotator-tokenizer</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.1</version>
     <packaging>jar</packaging>
     <name>annotator-tokenizer</name>
     <description>tokenizes texts</description>
@@ -315,7 +315,7 @@
                         </goals>
                         <phase>deploy</phase>
                         <configuration>
-                            <file>${project.build.directory}/${project.build.finalName}-lib.jar</file>
+                            <file>${project.build.directory}/${project.build.finalName}.jar.original</file>
                             <repositoryId>internal.repo::default::file://${project.build.directory}/mvn-repo</repositoryId>
                             <url>file://${project.build.directory}/mvn-repo</url>
                             <groupId>${project.groupId}</groupId>
