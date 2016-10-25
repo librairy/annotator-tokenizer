@@ -14,11 +14,3 @@ networks:
   lnet:
     external:
       name: distribution_lnet
-
-
-
-tokenizer:
-  container_name: tokenizer
-  image: librairy/annotator-tokenizer:latest
-  restart: always
-  networks: ["lnet"]
