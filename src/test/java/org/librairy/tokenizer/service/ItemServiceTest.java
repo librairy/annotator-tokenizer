@@ -1,6 +1,8 @@
 package org.librairy.tokenizer.service;
 
+import es.cbadenes.lab.test.IntegrationTest;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.librairy.model.domain.resources.Resource;
 import org.librairy.storage.UDM;
@@ -20,6 +22,7 @@ import java.util.List;
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
+@Category(IntegrationTest.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class)
 public class ItemServiceTest {

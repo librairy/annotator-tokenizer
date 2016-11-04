@@ -11,7 +11,7 @@
 
 	<groupId>org.librairy</groupId>
     <artifactId>librairy-annotator-tokenizer</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.4</version>
     <packaging>jar</packaging>
     <name>annotator-tokenizer</name>
     <description>tokenizes texts</description>
