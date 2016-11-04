@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
@@ -53,13 +54,13 @@ public class ItemService {
 
         Item item = optResource.get().asItem();
 
-        String tokens = tokenizer.tokenize(item.getContent(), Language.from(item.getLanguage())).stream().
+        Stream<String> tokens = tokenizer.tokenize(item.getContent(), Language.from(item.getLanguage
+                ())).stream().
                 filter(token -> token.isValid()).
-                map(token -> token.getLemma()).
-                collect(Collectors.joining(" "));
-        item.setTokens(tokens);
+                map(token -> token.getLemma());
+        item.setTokens(tokens.collect(Collectors.joining(" ")));
+        LOG.info(tokens.count() + " tokens in " + item.getUri());
         udm.update(item);
-        LOG.info("Item " + item.getUri() +  " tokenized");
     }
 
 }

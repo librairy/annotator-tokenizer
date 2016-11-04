@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
@@ -55,13 +56,12 @@ public class PartService {
 
         // TODO set language for Part
         Language language = Language.EN;
-        String tokens = tokenizer.tokenize(part.getContent(), language).stream().
+        Stream<String> tokens = tokenizer.tokenize(part.getContent(), language).stream().
                 filter(token -> token.isValid()).
-                map(token -> token.getLemma()).
-                collect(Collectors.joining(" "));
-        part.setTokens(tokens);
+                map(token -> token.getLemma());
+        part.setTokens(tokens.collect(Collectors.joining(" ")));
+        LOG.info(tokens.count() + " tokens in " + part.getUri());
         udm.update(part);
-        LOG.info("Part " + part.getUri() +  " tokenized");
     }
 
 }
