@@ -1,14 +1,11 @@
 package org.librairy.tokenizer.eventbus;
 
-import com.google.common.base.Strings;
 import org.librairy.model.Event;
-import org.librairy.model.domain.resources.Item;
 import org.librairy.model.domain.resources.Resource;
 import org.librairy.model.modules.BindingKey;
 import org.librairy.model.modules.EventBus;
 import org.librairy.model.modules.EventBusSubscriber;
 import org.librairy.model.modules.RoutingKey;
-import org.librairy.storage.UDM;
 import org.librairy.tokenizer.service.ItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
