@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,18 +51,21 @@ public class PartService {
             LOG.warn("No PART found by uri:  " + resource.getUri());
             return;
         }
+        try{
+            Part part = optResource.get().asPart();
 
-
-        Part part = optResource.get().asPart();
-
-        // TODO set language for Part
-        Language language = Language.EN;
-        Stream<String> tokens = tokenizer.tokenize(part.getContent(), language).stream().
-                filter(token -> token.isValid()).
-                map(token -> token.getLemma());
-        part.setTokens(tokens.collect(Collectors.joining(" ")));
-        LOG.info(tokens.count() + " tokens in " + part.getUri());
-        udm.update(part);
+            // TODO set language for Part
+            Language language = Language.EN;
+            List<String> tokens = tokenizer.tokenize(part.getContent(), language).stream().
+                    filter(token -> token.isValid()).
+                    map(token -> token.getLemma()).collect(Collectors.toList());
+                     
+            part.setTokens(tokens.stream().collect(Collectors.joining(" ")));
+            LOG.info(tokens.size() + " tokens in " + part.getUri());
+            udm.update(part);
+        }catch (Exception e){
+            LOG.error("Error on tokenizer", e);
+        }
     }
 
 }

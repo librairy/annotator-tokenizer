@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,12 +55,14 @@ public class ItemService {
 
         Item item = optResource.get().asItem();
 
-        Stream<String> tokens = tokenizer.tokenize(item.getContent(), Language.from(item.getLanguage
+        List<String> tokens = tokenizer.tokenize(item.getContent(), Language.from(item.getLanguage
                 ())).stream().
                 filter(token -> token.isValid()).
-                map(token -> token.getLemma());
-        item.setTokens(tokens.collect(Collectors.joining(" ")));
-        LOG.info(tokens.count() + " tokens in " + item.getUri());
+                map(token -> token.getLemma()).
+                collect(Collectors.toList());
+
+        item.setTokens(tokens.stream().collect(Collectors.joining(" ")));
+        LOG.info(tokens.size() + " tokens in " + item.getUri());
         udm.update(item);
     }
 
