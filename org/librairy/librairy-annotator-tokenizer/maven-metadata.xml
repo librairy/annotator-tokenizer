@@ -3,10 +3,10 @@
   <groupId>org.librairy</groupId>
   <artifactId>librairy-annotator-tokenizer</artifactId>
   <versioning>
-    <release>0.3</release>
+    <release>0.4</release>
     <versions>
-      <version>0.3</version>
+      <version>0.4</version>
     </versions>
-    <lastUpdated>20161025141935</lastUpdated>
+    <lastUpdated>20161104110359</lastUpdated>
   </versioning>
 </metadata>
