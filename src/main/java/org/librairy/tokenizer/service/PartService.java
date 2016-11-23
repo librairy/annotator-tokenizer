@@ -1,9 +1,9 @@
 package org.librairy.tokenizer.service;
 
-import org.librairy.model.domain.resources.Part;
-import org.librairy.model.domain.resources.Resource;
-import org.librairy.storage.UDM;
-import org.librairy.storage.executor.ParallelExecutor;
+import org.librairy.boot.model.domain.resources.Part;
+import org.librairy.boot.model.domain.resources.Resource;
+import org.librairy.boot.storage.UDM;
+import org.librairy.boot.storage.executor.ParallelExecutor;
 import org.librairy.tokenizer.annotator.Language;
 import org.librairy.tokenizer.annotator.Tokenizer;
 import org.slf4j.Logger;
@@ -15,7 +15,6 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>

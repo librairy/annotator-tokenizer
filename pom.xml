@@ -11,7 +11,7 @@
 
 	<groupId>org.librairy</groupId>
     <artifactId>librairy-annotator-tokenizer</artifactId>
-    <version>0.6-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
     <name>annotator-tokenizer</name>
     <description>tokenizes texts</description>
@@ -77,7 +77,7 @@
         <maven.compiler.plugin.version>3.3</maven.compiler.plugin.version>
 
         <coreNlpExtensions.version>1.0</coreNlpExtensions.version>
-        <librairy.boot.version>0.32</librairy.boot.version>
+        <librairy.boot.version>0.38</librairy.boot.version>
         <lucene.version>4.10.4</lucene.version>
         <junit.version>4.12</junit.version>
         <spring.version>4.2.7.RELEASE</spring.version>

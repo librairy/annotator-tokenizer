@@ -1,12 +1,11 @@
 package org.librairy.tokenizer.eventbus;
 
-import org.librairy.model.Event;
-import org.librairy.model.domain.resources.Resource;
-import org.librairy.model.modules.BindingKey;
-import org.librairy.model.modules.EventBus;
-import org.librairy.model.modules.EventBusSubscriber;
-import org.librairy.model.modules.RoutingKey;
-import org.librairy.storage.UDM;
+import org.librairy.boot.model.Event;
+import org.librairy.boot.model.domain.resources.Resource;
+import org.librairy.boot.model.modules.BindingKey;
+import org.librairy.boot.model.modules.EventBus;
+import org.librairy.boot.model.modules.EventBusSubscriber;
+import org.librairy.boot.model.modules.RoutingKey;
 import org.librairy.tokenizer.service.PartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

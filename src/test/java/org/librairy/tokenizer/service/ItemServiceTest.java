@@ -4,8 +4,11 @@ import es.cbadenes.lab.test.IntegrationTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.librairy.model.domain.resources.Resource;
-import org.librairy.storage.UDM;
+import org.librairy.boot.model.Event;
+import org.librairy.boot.model.domain.resources.Resource;
+import org.librairy.boot.model.modules.EventBus;
+import org.librairy.boot.model.modules.RoutingKey;
+import org.librairy.boot.storage.UDM;
 import org.librairy.tokenizer.Application;
 import org.librairy.tokenizer.Config;
 import org.librairy.tokenizer.annotator.Language;
@@ -15,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
@@ -25,6 +29,13 @@ import java.util.List;
 @Category(IntegrationTest.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class)
+@TestPropertySource(properties = {
+        "librairy.columndb.host = zavijava.dia.fi.upm.es",
+        "librairy.documentdb.host = zavijava.dia.fi.upm.es",
+        "librairy.graphdb.host = zavijava.dia.fi.upm.es",
+        "librairy.eventbus.host = zavijava.dia.fi.upm.es"
+//        "librairy.uri = drinventor.eu" //librairy.org
+})
 public class ItemServiceTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(ItemServiceTest.class);
@@ -35,14 +46,30 @@ public class ItemServiceTest {
     @Autowired
     ItemService itemService;
 
+    @Autowired
+    PartService partService;
+
+    @Autowired
+    EventBus eventBus;
 
     @Test
-    public void readItems(){
+    public void tokenizeItemsAndParts(){
 
-        udm.find(Resource.Type.ITEM).all().parallelStream().forEach(resource -> {
+        udm.find(Resource.Type.ITEM).all().stream().forEach(resource -> {
 
             LOG.info("Trying to tokenize: " + resource);
-            itemService.handle(resource);
+//            itemService.handle(resource);
+
+            eventBus.post(Event.from(resource), RoutingKey.of(Resource.Type.ITEM, Resource.State.CREATED));
+
+
+        });
+
+        udm.find(Resource.Type.PART).all().stream().forEach(resource -> {
+
+            LOG.info("Trying to tokenize: " + resource);
+//            partService.handle(resource);
+            eventBus.post(Event.from(resource), RoutingKey.of(Resource.Type.PART, Resource.State.CREATED));
 
 
         });

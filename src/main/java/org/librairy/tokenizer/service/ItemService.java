@@ -1,10 +1,10 @@
 package org.librairy.tokenizer.service;
 
-import org.librairy.model.domain.resources.Item;
-import org.librairy.model.domain.resources.Resource;
-import org.librairy.storage.UDM;
-import org.librairy.storage.executor.ParallelExecutor;
-import org.librairy.storage.generator.URIGenerator;
+import org.librairy.boot.model.domain.resources.Item;
+import org.librairy.boot.model.domain.resources.Resource;
+import org.librairy.boot.storage.UDM;
+import org.librairy.boot.storage.executor.ParallelExecutor;
+import org.librairy.boot.storage.generator.URIGenerator;
 import org.librairy.tokenizer.annotator.Language;
 import org.librairy.tokenizer.annotator.Tokenizer;
 import org.slf4j.Logger;
@@ -62,8 +62,8 @@ public class ItemService {
                 collect(Collectors.toList());
 
         item.setTokens(tokens.stream().collect(Collectors.joining(" ")));
-        LOG.info(tokens.size() + " tokens in " + item.getUri());
         udm.update(item);
+        LOG.info(tokens.size() + " tokens saved for: " + item.getUri());
     }
 
 }

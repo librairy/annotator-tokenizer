@@ -6,13 +6,12 @@ RUN apk --update add git tar bash
 ENV LIBRAIRY_HOME /librairy
 
 VOLUME /tmp
+VOLUME /librairy
 
 ADD waitFor.sh /
 RUN chmod +x /waitFor.sh
 
 ADD annotator-tokenizer.jar app.jar
-
-VOLUME /librairy
 
 RUN sh -c 'touch /app.jar'
 

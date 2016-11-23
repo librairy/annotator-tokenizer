@@ -2,9 +2,9 @@ package org.librairy.tokenizer.annotator;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.librairy.model.domain.resources.Item;
-import org.librairy.model.domain.resources.Resource;
-import org.librairy.storage.UDM;
+import org.librairy.boot.model.domain.resources.Item;
+import org.librairy.boot.model.domain.resources.Resource;
+import org.librairy.boot.storage.UDM;
 import org.librairy.tokenizer.Config;
 import org.librairy.tokenizer.service.ItemService;
 import org.slf4j.Logger;
