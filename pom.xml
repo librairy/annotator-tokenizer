@@ -60,6 +60,16 @@
             </snapshots>
         </repository>
 
+        <!-- Librairy External-Libs Repository -->
+        <repository>
+            <id>external-libs</id>
+            <url>https://raw.github.com/cbadenes/external-libs/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+
     </repositories>
 
     <prerequisites>
