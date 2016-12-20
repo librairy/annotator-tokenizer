@@ -6,13 +6,11 @@ import org.librairy.boot.model.domain.resources.Resource;
 import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.RoutingKey;
 import org.librairy.boot.storage.UDM;
+import org.librairy.boot.storage.dao.ItemsDao;
 import org.librairy.boot.storage.dao.ParametersDao;
-import org.librairy.boot.storage.dao.TokensDao;
 import org.librairy.boot.storage.exception.DataNotFound;
 import org.librairy.boot.storage.executor.ParallelExecutor;
-import org.librairy.boot.storage.generator.URIGenerator;
 import org.librairy.tokenizer.annotator.Language;
-import org.librairy.tokenizer.annotator.Tokenizer;
 import org.librairy.tokenizer.annotator.TokenizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +21,6 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
@@ -43,7 +40,7 @@ public class ItemService {
     ParametersDao parametersDao;
 
     @Autowired
-    TokensDao tokensDao;
+    ItemsDao itemsDao;
 
     @Autowired
     EventBus eventBus;
@@ -62,7 +59,7 @@ public class ItemService {
 
     public void handle(String domainUri,  String itemUri){
 
-        String tokenizerMode = "default";
+        String tokenizerMode;
         try {
             tokenizerMode = parametersDao.get(domainUri, "tokenizer.mode");
         } catch (DataNotFound dataNotFound) {
@@ -85,7 +82,7 @@ public class ItemService {
                 collect(Collectors.toList());
 
 
-        tokensDao.saveOrUpdate(domainUri, itemUri, tokens.stream().collect(Collectors.joining(" ")));
+        itemsDao.saveOrUpdateTokens(domainUri, itemUri, tokens.stream().collect(Collectors.joining(" ")));
         LOG.info(tokens.size() + " tokens in: " + item.getUri());
 
         // publish event

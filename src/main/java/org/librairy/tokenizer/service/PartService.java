@@ -7,11 +7,10 @@ import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.RoutingKey;
 import org.librairy.boot.storage.UDM;
 import org.librairy.boot.storage.dao.ParametersDao;
-import org.librairy.boot.storage.dao.TokensDao;
+import org.librairy.boot.storage.dao.PartsDao;
 import org.librairy.boot.storage.exception.DataNotFound;
 import org.librairy.boot.storage.executor.ParallelExecutor;
 import org.librairy.tokenizer.annotator.Language;
-import org.librairy.tokenizer.annotator.Tokenizer;
 import org.librairy.tokenizer.annotator.TokenizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,7 @@ public class PartService {
     ParametersDao parametersDao;
 
     @Autowired
-    TokensDao tokensDao;
+    PartsDao partsDao;
 
     @Autowired
     EventBus eventBus;
@@ -60,7 +59,7 @@ public class PartService {
 
     public void handle(String domainUri,  String partUri){
 
-        String tokenizerMode = "default";
+        String tokenizerMode;
         try {
             tokenizerMode = parametersDao.get(domainUri, "tokenizer.mode");
         } catch (DataNotFound dataNotFound) {
@@ -83,7 +82,7 @@ public class PartService {
                     map(token -> token.getLemma()).collect(Collectors.toList());
 
 
-            tokensDao.saveOrUpdate(domainUri, partUri,tokens.stream().collect(Collectors.joining(" ")) );
+            partsDao.saveOrUpdateTokens(domainUri, partUri,tokens.stream().collect(Collectors.joining(" ")) );
             LOG.info(tokens.size() + " tokens in " + part.getUri());
 
             // publish event
