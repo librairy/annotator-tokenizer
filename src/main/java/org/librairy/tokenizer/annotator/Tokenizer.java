@@ -18,4 +18,5 @@ public interface Tokenizer {
 
     List<Token> tokenize(String text, Language language);
 
+    String getMode();
 }

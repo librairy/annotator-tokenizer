@@ -1,12 +1,19 @@
 package org.librairy.tokenizer.service;
 
+import org.librairy.boot.model.Event;
 import org.librairy.boot.model.domain.resources.Item;
 import org.librairy.boot.model.domain.resources.Resource;
+import org.librairy.boot.model.modules.EventBus;
+import org.librairy.boot.model.modules.RoutingKey;
 import org.librairy.boot.storage.UDM;
+import org.librairy.boot.storage.dao.ParametersDao;
+import org.librairy.boot.storage.dao.TokensDao;
+import org.librairy.boot.storage.exception.DataNotFound;
 import org.librairy.boot.storage.executor.ParallelExecutor;
 import org.librairy.boot.storage.generator.URIGenerator;
 import org.librairy.tokenizer.annotator.Language;
 import org.librairy.tokenizer.annotator.Tokenizer;
+import org.librairy.tokenizer.annotator.TokenizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +37,16 @@ public class ItemService {
     UDM udm;
 
     @Autowired
-    Tokenizer tokenizer;
+    TokenizerFactory tokenizerFactory;
+
+    @Autowired
+    ParametersDao parametersDao;
+
+    @Autowired
+    TokensDao tokensDao;
+
+    @Autowired
+    EventBus eventBus;
 
     private ParallelExecutor executor;
 
@@ -40,30 +56,42 @@ public class ItemService {
     }
 
 
-    public void handleParallel(Resource resource){
-        executor.execute(() -> handle(resource));
+    public void handleParallel(String domainUri, String itemUri){
+        executor.execute(() -> handle(domainUri, itemUri));
     }
 
-    public void handle(Resource resource){
+    public void handle(String domainUri,  String itemUri){
 
-        Optional<Resource> optResource = udm.read(Resource.Type.ITEM).byUri(resource.getUri());
+        String tokenizerMode = "default";
+        try {
+            tokenizerMode = parametersDao.get(domainUri, "tokenizer.mode");
+        } catch (DataNotFound dataNotFound) {
+            tokenizerMode = "lemmatization";
+        }
+
+        Optional<Resource> optResource = udm.read(Resource.Type.ITEM).byUri(itemUri);
 
         if (!optResource.isPresent()){
-            LOG.warn("No ITEM found by uri:  " + resource.getUri());
+            LOG.warn("No ITEM found by uri:  " + itemUri);
             return;
         }
 
         Item item = optResource.get().asItem();
 
-        List<String> tokens = tokenizer.tokenize(item.getContent(), Language.from(item.getLanguage
+        List<String> tokens = tokenizerFactory.of(tokenizerMode).tokenize(item.getContent(), Language.from(item.getLanguage
                 ())).stream().
                 filter(token -> token.isValid()).
                 map(token -> token.getLemma()).
                 collect(Collectors.toList());
 
-        item.setTokens(tokens.stream().collect(Collectors.joining(" ")));
-        udm.update(item);
-        LOG.info(tokens.size() + " tokens saved for: " + item.getUri());
+
+        tokensDao.saveOrUpdate(domainUri, itemUri, tokens.stream().collect(Collectors.joining(" ")));
+        LOG.info(tokens.size() + " tokens in: " + item.getUri());
+
+        // publish event
+        Resource domain = new org.librairy.boot.model.domain.resources.Resource();
+        domain.setUri(domainUri);
+        eventBus.post(Event.from(domain), RoutingKey.of(Resource.Type.DOMAIN, Resource.State.UPDATED));
     }
 
 }

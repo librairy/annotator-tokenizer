@@ -50,4 +50,9 @@ public class DefaultTokenizer implements Tokenizer{
             return new ArrayList<>();
         }
     }
+
+    @Override
+    public String getMode() {
+        return "lemmatization";
+    }
 }

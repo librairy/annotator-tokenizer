@@ -1,6 +1,7 @@
 package org.librairy.tokenizer.eventbus;
 
 import org.librairy.boot.model.Event;
+import org.librairy.boot.model.domain.relations.Relation;
 import org.librairy.boot.model.domain.resources.Resource;
 import org.librairy.boot.model.modules.BindingKey;
 import org.librairy.boot.model.modules.EventBus;
@@ -30,7 +31,7 @@ public class PartCreatedEventHandler implements EventBusSubscriber {
 
     @PostConstruct
     public void init(){
-        RoutingKey routingKey = RoutingKey.of(Resource.Type.PART, Resource.State.CREATED);
+        RoutingKey routingKey = RoutingKey.of(Relation.Type.CONTAINS_TO_PART, Relation.State.CREATED);
         LOG.info("Trying to register as subscriber of '" + routingKey + "' events ..");
         eventBus.subscribe(this, BindingKey.of(routingKey, "tokenizer-part"));
         LOG.info("registered successfully");
@@ -42,8 +43,10 @@ public class PartCreatedEventHandler implements EventBusSubscriber {
         LOG.debug("New Part event received: " + event);
         try{
 
-            Resource resource = event.to(Resource.class);
-            service.handleParallel(resource);
+            Relation relation = event.to(Relation.class);
+            String domainUri    = relation.getStartUri();
+            String partUri      = relation.getEndUri();
+            service.handleParallel(domainUri, partUri);
 
         } catch (RuntimeException e){
             LOG.warn(e.getMessage());
