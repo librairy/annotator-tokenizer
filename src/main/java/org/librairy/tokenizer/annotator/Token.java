@@ -24,10 +24,13 @@ public class Token implements Serializable {
     String lemma;
 
     boolean stopWord;
+    boolean isEntity = false;
 
     public boolean isValid(){
         return !stopWord
                 && lemma.length()>2
                 && pos.toLowerCase().startsWith("n");
     }
+    
+    
 }

@@ -26,7 +26,7 @@ public class TokenizerTest {
 
 
     @Autowired
-    Tokenizer tokenizer;
+    TokenizerEntity tokenizer;
 
     @Test
     public void phrase(){
