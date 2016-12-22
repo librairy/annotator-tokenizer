@@ -74,7 +74,7 @@ public class ItemService {
         }
 
         Item item = optResource.get().asItem();
-
+        LOG.info("Tokenizing " + itemUri + "...");
         List<String> tokens = tokenizerFactory.of(tokenizerMode).tokenize(item.getContent(), Language.from(item.getLanguage
                 ())).stream().
                 filter(token -> token.isValid()).

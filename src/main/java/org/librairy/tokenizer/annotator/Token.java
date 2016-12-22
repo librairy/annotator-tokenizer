@@ -30,4 +30,5 @@ public class Token implements Serializable {
                 && lemma.length()>2
                 && pos.toLowerCase().startsWith("n");
     }
+
 }

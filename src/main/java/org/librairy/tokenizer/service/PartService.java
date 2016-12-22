@@ -75,6 +75,8 @@ public class PartService {
         try{
             Part part = optResource.get().asPart();
 
+            LOG.info("Tokenizing " + partUri + "...");
+
             // TODO set language for Part
             Language language = Language.EN;
             List<String> tokens = tokenizerFactory.of(tokenizerMode).tokenize(part.getContent(), language).stream().
