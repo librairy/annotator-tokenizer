@@ -7,6 +7,8 @@
 
 package org.librairy.tokenizer.annotator.stanford;
 
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -240,6 +242,7 @@ public class StanfordTokenizerES implements StanfordTokenizer {
             "vosotros" +
             "voy" +
             "yo";
+    private final Escaper escaper;
 
     private StanfordCoreNLP pipeline;
 
@@ -270,6 +273,8 @@ public class StanfordTokenizerES implements StanfordTokenizer {
         // Parallel
         //props.put("threads", "8");
         pipeline = new StanfordCoreNLP(props);
+
+        escaper = Escapers.builder().addEscape('\'',"_").build();
     }
 
 
@@ -291,7 +296,7 @@ public class StanfordTokenizerES implements StanfordTokenizer {
             for (CoreLabel coreLabel: sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                 Token token = new Token();
                 token.setPos(coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class).toLowerCase());
-                token.setLemma(coreLabel.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase());
+                token.setLemma(escaper.escape(coreLabel.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase()));
                 token.setWord(coreLabel.get(CoreAnnotations.TextAnnotation.class).toLowerCase());
                 token.setStopWord(coreLabel.get(StopWordAnnotatorWrapper.class).first);
                 tokens.add(token);
