@@ -59,36 +59,41 @@ public class ItemService {
 
     public void handle(String domainUri,  String itemUri){
 
-        String tokenizerMode;
-        try {
-            tokenizerMode = parametersDao.get(domainUri, "tokenizer.mode");
-        } catch (DataNotFound dataNotFound) {
-            tokenizerMode = "lemmatization";
+        try{
+            String tokenizerMode;
+            try {
+                tokenizerMode = parametersDao.get(domainUri, "tokenizer.mode");
+            } catch (DataNotFound dataNotFound) {
+                tokenizerMode = "lemmatization";
+            }
+
+            Optional<Resource> optResource = udm.read(Resource.Type.ITEM).byUri(itemUri);
+
+            if (!optResource.isPresent()){
+                LOG.warn("No ITEM found by uri:  " + itemUri);
+                return;
+            }
+
+            Item item = optResource.get().asItem();
+            LOG.info("Tokenizing " + itemUri + "...");
+            List<String> tokens = tokenizerFactory.of(tokenizerMode).tokenize(item.getContent(), Language.from(item.getLanguage
+                    ())).stream().
+                    filter(token -> token.isValid()).
+                    map(token -> token.getLemma()).
+                    collect(Collectors.toList());
+
+
+            String tokensVal = tokens.stream().collect(Collectors.joining(" "));
+            itemsDao.saveOrUpdateTokens(domainUri, itemUri, tokensVal);
+            LOG.info(tokens.size() + " tokens in: " + item.getUri());
+
+            // publish event
+            Resource domain = new org.librairy.boot.model.domain.resources.Resource();
+            domain.setUri(domainUri);
+            eventBus.post(Event.from(domain), RoutingKey.of(Resource.Type.DOMAIN, Resource.State.UPDATED));
+        }catch (Exception e){
+            LOG.warn("Unexpected error",e);
         }
-
-        Optional<Resource> optResource = udm.read(Resource.Type.ITEM).byUri(itemUri);
-
-        if (!optResource.isPresent()){
-            LOG.warn("No ITEM found by uri:  " + itemUri);
-            return;
-        }
-
-        Item item = optResource.get().asItem();
-        LOG.info("Tokenizing " + itemUri + "...");
-        List<String> tokens = tokenizerFactory.of(tokenizerMode).tokenize(item.getContent(), Language.from(item.getLanguage
-                ())).stream().
-                filter(token -> token.isValid()).
-                map(token -> token.getLemma()).
-                collect(Collectors.toList());
-
-
-        itemsDao.saveOrUpdateTokens(domainUri, itemUri, tokens.stream().collect(Collectors.joining(" ")));
-        LOG.info(tokens.size() + " tokens in: " + item.getUri());
-
-        // publish event
-        Resource domain = new org.librairy.boot.model.domain.resources.Resource();
-        domain.setUri(domainUri);
-        eventBus.post(Event.from(domain), RoutingKey.of(Resource.Type.DOMAIN, Resource.State.UPDATED));
     }
 
 }

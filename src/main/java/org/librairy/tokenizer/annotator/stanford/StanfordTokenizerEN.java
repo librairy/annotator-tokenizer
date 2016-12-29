@@ -114,7 +114,13 @@ public class StanfordTokenizerEN implements StanfordTokenizer {
         //props.put("threads", "8");
         pipeline = new StanfordCoreNLP(props);
 
-        escaper = Escapers.builder().addEscape('\'',"_").build();
+        escaper = Escapers.builder()
+                .addEscape('\'',"_")
+                .addEscape('('," ")
+                .addEscape(')'," ")
+                .addEscape('['," ")
+                .addEscape(']'," ")
+                .build();
     }
 
 
