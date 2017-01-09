@@ -9,6 +9,7 @@ package org.librairy.tokenizer.annotator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.librairy.tokenizer.annotator.stanford.StanfordTokenizer;
+import org.librairy.tokenizer.annotator.stanford.StanfordTokenizerCompoundEN;
 import org.librairy.tokenizer.annotator.stanford.StanfordTokenizerEN;
 import org.librairy.tokenizer.annotator.stanford.StanfordTokenizerES;
 import org.librairy.tokenizer.annotator.stanford.StanfordTokenizerEntityEN;
@@ -28,20 +29,18 @@ import java.util.Map;
  * @author cbadenes
  */
 @Component
-public class TokenizerLemmaEntity implements Tokenizer{
+public class TokenizerCompound implements Tokenizer{
 
-    private static final Logger LOG = LoggerFactory.getLogger(TokenizerLemmaEntity.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TokenizerEntity.class);
 
     private Map<Language, StanfordTokenizer> tokenizers;
-    
-    private int entityWeight =1;
 
     @PostConstruct
     public void setup(){
 
         tokenizers = new HashMap();
 
-        tokenizers.put(Language.EN,new StanfordTokenizerEntityEN());
+        tokenizers.put(Language.EN,new StanfordTokenizerCompoundEN());
         //tokenizers.put(Language.ES,new StanfordTokenizerES());
     }
 
@@ -49,20 +48,7 @@ public class TokenizerLemmaEntity implements Tokenizer{
     public List<Token> tokenize(String text, Language language){
         try {
 
-            List<Token> entityTokens = tokenizers.get(language).tokenize(text);
-            StanfordTokenizerEN lemmaTokenizer = new StanfordTokenizerEN();
-            
-            List<Token> lemmaTokens = lemmaTokenizer.tokenize(text);
-            
-           //fusion
-            for (Token te :entityTokens){
-            	for (int i = 0;i<entityWeight; i++){
-            		lemmaTokens.add(te);
-            	}
-            }
-            
-            return lemmaTokens;
-
+            return tokenizers.get(language).tokenize(text);
         } catch (Exception e) {
             LOG.error("Error extracting tokens from text: " + StringUtils.substring(text,0,10) + " ...",e);
             return new ArrayList<>();
@@ -71,6 +57,6 @@ public class TokenizerLemmaEntity implements Tokenizer{
 
     @Override
     public String getMode() {
-        return "lemma_ner";
+        return "compound";
     }
 }

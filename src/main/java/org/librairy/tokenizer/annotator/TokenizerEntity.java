@@ -14,6 +14,7 @@ import org.librairy.tokenizer.annotator.stanford.StanfordTokenizerES;
 import org.librairy.tokenizer.annotator.stanford.StanfordTokenizerEntityEN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.Map;
  *
  * @author cbadenes
  */
+@Component
 public class TokenizerEntity implements Tokenizer{
 
     private static final Logger LOG = LoggerFactory.getLogger(TokenizerEntity.class);
