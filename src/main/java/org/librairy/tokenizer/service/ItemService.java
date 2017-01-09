@@ -87,10 +87,6 @@ public class ItemService {
             itemsDao.saveOrUpdateTokens(domainUri, itemUri, tokensVal);
             LOG.info(tokens.size() + " tokens in: " + item.getUri());
 
-            // publish event
-            Resource domain = new org.librairy.boot.model.domain.resources.Resource();
-            domain.setUri(domainUri);
-            eventBus.post(Event.from(domain), RoutingKey.of(Resource.Type.DOMAIN, Resource.State.UPDATED));
         }catch (Exception e){
             LOG.warn("Unexpected error",e);
         }

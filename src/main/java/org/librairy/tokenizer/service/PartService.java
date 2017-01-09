@@ -87,12 +87,6 @@ public class PartService {
             partsDao.saveOrUpdateTokens(domainUri, partUri,tokens.stream().collect(Collectors.joining(" ")) );
             LOG.info(tokens.size() + " tokens in " + part.getUri());
 
-            // publish event
-            Resource domain = new org.librairy.boot.model.domain.resources.Resource();
-            domain.setUri(domainUri);
-            eventBus.post(Event.from(domain), RoutingKey.of(Resource.Type.DOMAIN, Resource.State.UPDATED));
-
-
         }catch (Exception e){
             LOG.error("Error on tokenizer", e);
         }
