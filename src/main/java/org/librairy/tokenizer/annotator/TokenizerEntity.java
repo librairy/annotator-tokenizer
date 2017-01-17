@@ -22,11 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created on 07/04/16:
- *
- * @author cbadenes
- */
 @Component
 public class TokenizerEntity implements Tokenizer{
 

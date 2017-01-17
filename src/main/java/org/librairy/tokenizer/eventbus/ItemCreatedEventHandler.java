@@ -2,6 +2,7 @@ package org.librairy.tokenizer.eventbus;
 
 import org.librairy.boot.model.Event;
 import org.librairy.boot.model.domain.relations.Relation;
+import org.librairy.boot.model.domain.resources.Resource;
 import org.librairy.boot.model.modules.BindingKey;
 import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.EventBusSubscriber;
@@ -30,7 +31,7 @@ public class ItemCreatedEventHandler implements EventBusSubscriber {
 
     @PostConstruct
     public void init(){
-        RoutingKey routingKey = RoutingKey.of(Relation.Type.CONTAINS_TO_ITEM, Relation.State.CREATED);
+        RoutingKey routingKey = RoutingKey.of(Resource.Type.ITEM, Resource.State.CREATED);
         LOG.info("Trying to register as subscriber of '" + routingKey + "' events ..");
         eventBus.subscribe(this, BindingKey.of(routingKey, "tokenizer-item"));
         LOG.info("registered successfully");
@@ -39,13 +40,10 @@ public class ItemCreatedEventHandler implements EventBusSubscriber {
 
     @Override
     public void handle(Event event) {
-        LOG.debug("New Item event received: " + event);
+        LOG.debug("event received: " + event);
         try{
-
-            Relation relation = event.to(Relation.class);
-            String domainUri    = relation.getStartUri();
-            String itemUri      = relation.getEndUri();
-            itemService.handleParallel(domainUri, itemUri);
+            Resource resource = event.to(Resource.class);
+            itemService.handleParallel(resource.getUri());
 
         } catch (RuntimeException e){
             LOG.warn(e.getMessage());

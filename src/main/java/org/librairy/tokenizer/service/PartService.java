@@ -6,11 +6,13 @@ import org.librairy.boot.model.domain.resources.Resource;
 import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.RoutingKey;
 import org.librairy.boot.storage.UDM;
+import org.librairy.boot.storage.dao.AnnotationsDao;
 import org.librairy.boot.storage.dao.ParametersDao;
 import org.librairy.boot.storage.dao.PartsDao;
 import org.librairy.boot.storage.exception.DataNotFound;
 import org.librairy.boot.storage.executor.ParallelExecutor;
 import org.librairy.tokenizer.annotator.Language;
+import org.librairy.tokenizer.annotator.Tokenizer;
 import org.librairy.tokenizer.annotator.TokenizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
@@ -34,16 +37,10 @@ public class PartService {
     UDM udm;
 
     @Autowired
-    TokenizerFactory tokenizerFactory;
+    List<Tokenizer> tokenizers;
 
     @Autowired
-    ParametersDao parametersDao;
-
-    @Autowired
-    PartsDao partsDao;
-
-    @Autowired
-    EventBus eventBus;
+    AnnotationsDao annotationsDao;
 
     private ParallelExecutor executor;
 
@@ -53,18 +50,11 @@ public class PartService {
     }
 
 
-    public void handleParallel(String domainUri, String partUri){
-        executor.execute(() -> handle(domainUri, partUri));
+    public void handleParallel(String partUri){
+        executor.execute(() -> handle(partUri));
     }
 
-    public void handle(String domainUri,  String partUri){
-
-        String tokenizerMode;
-        try {
-            tokenizerMode = parametersDao.get(domainUri, "tokenizer.mode");
-        } catch (DataNotFound dataNotFound) {
-            tokenizerMode = "lemmatization";
-        }
+    public void handle(String partUri){
 
         Optional<Resource> optResource = udm.read(Resource.Type.PART).byUri(partUri);
 
@@ -75,17 +65,17 @@ public class PartService {
         try{
             Part part = optResource.get().asPart();
 
-            LOG.info("Tokenizing " + partUri + "...");
+            //TODO handle language in PARTs
+            tokenizers.parallelStream().forEach(tokenizer -> {
+                Stream<String> tokens = tokenizer.tokenize(part.getContent(),Language.EN)
+                        .stream()
+                        .filter(token -> token.isValid())
+                        .map(token -> token.getLemma())
+                        ;
 
-            // TODO set language for Part
-            Language language = Language.EN;
-            List<String> tokens = tokenizerFactory.of(tokenizerMode).tokenize(part.getContent(), language).stream().
-                    filter(token -> token.isValid()).
-                    map(token -> token.getLemma()).collect(Collectors.toList());
-
-
-            partsDao.saveOrUpdateTokens(domainUri, partUri,tokens.stream().collect(Collectors.joining(" ")) );
-            LOG.info(tokens.size() + " tokens in " + part.getUri());
+                LOG.info("Parsed '" + partUri + "' to " + tokens.count() + " " + tokenizer.getMode());
+                annotationsDao.saveOrUpdate(part.getUri(), tokenizer.getMode(), tokens.collect(Collectors.joining(",")));
+            });
 
         }catch (Exception e){
             LOG.error("Error on tokenizer", e);

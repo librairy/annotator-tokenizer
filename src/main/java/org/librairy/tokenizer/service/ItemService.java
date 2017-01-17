@@ -6,11 +6,13 @@ import org.librairy.boot.model.domain.resources.Resource;
 import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.RoutingKey;
 import org.librairy.boot.storage.UDM;
+import org.librairy.boot.storage.dao.AnnotationsDao;
 import org.librairy.boot.storage.dao.ItemsDao;
 import org.librairy.boot.storage.dao.ParametersDao;
 import org.librairy.boot.storage.exception.DataNotFound;
 import org.librairy.boot.storage.executor.ParallelExecutor;
 import org.librairy.tokenizer.annotator.Language;
+import org.librairy.tokenizer.annotator.Tokenizer;
 import org.librairy.tokenizer.annotator.TokenizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
@@ -34,16 +37,10 @@ public class ItemService {
     UDM udm;
 
     @Autowired
-    TokenizerFactory tokenizerFactory;
+    List<Tokenizer> tokenizers;
 
     @Autowired
-    ParametersDao parametersDao;
-
-    @Autowired
-    ItemsDao itemsDao;
-
-    @Autowired
-    EventBus eventBus;
+    AnnotationsDao annotationsDao;
 
     private ParallelExecutor executor;
 
@@ -53,20 +50,13 @@ public class ItemService {
     }
 
 
-    public void handleParallel(String domainUri, String itemUri){
-        executor.execute(() -> handle(domainUri, itemUri));
+    public void handleParallel(String itemUri){
+        executor.execute(() -> handle(itemUri));
     }
 
-    public void handle(String domainUri,  String itemUri){
+    public void handle(String itemUri){
 
         try{
-            String tokenizerMode;
-            try {
-                tokenizerMode = parametersDao.get(domainUri, "tokenizer.mode");
-            } catch (DataNotFound dataNotFound) {
-                tokenizerMode = "lemmatization";
-            }
-
             Optional<Resource> optResource = udm.read(Resource.Type.ITEM).byUri(itemUri);
 
             if (!optResource.isPresent()){
@@ -75,17 +65,18 @@ public class ItemService {
             }
 
             Item item = optResource.get().asItem();
-            LOG.info("Tokenizing " + itemUri + "...");
-            List<String> tokens = tokenizerFactory.of(tokenizerMode).tokenize(item.getContent(), Language.from(item.getLanguage
-                    ())).stream().
-                    filter(token -> token.isValid()).
-                    map(token -> token.getLemma()).
-                    collect(Collectors.toList());
 
+            tokenizers.parallelStream().forEach(tokenizer -> {
+                Stream<String> tokens = tokenizer.tokenize(item.getContent(),Language.from(item.getLanguage()))
+                        .stream()
+                        .filter(token -> token.isValid())
+                        .map(token -> token.getLemma())
+                        ;
 
-            String tokensVal = tokens.stream().collect(Collectors.joining(" "));
-            itemsDao.saveOrUpdateTokens(domainUri, itemUri, tokensVal);
-            LOG.info(tokens.size() + " tokens in: " + item.getUri());
+                LOG.info("Parsed '" + itemUri + "' to " + tokens.count() + " " + tokenizer.getMode());
+                annotationsDao.saveOrUpdate(item.getUri(), tokenizer.getMode(), tokens.collect(Collectors.joining(",")));
+            });
+
 
         }catch (Exception e){
             LOG.warn("Unexpected error",e);
