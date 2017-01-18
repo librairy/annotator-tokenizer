@@ -1,29 +1,23 @@
-/*
- * Copyright (c) 2016. Universidad Politecnica de Madrid
- *
- * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
- *
- */
-
 package org.librairy.tokenizer.annotator.stanford;
 
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.util.CoreMap;
-import org.librairy.tokenizer.annotator.Token;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.PostConstruct;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Properties;
 
 /**
- * Created by cbadenes on 07/01/16.
+ * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
-public class StanfordTokenizerES implements StanfordTokenizer {
+@Component
+public class StanfordAnnotatorES {
 
     /**
      *
@@ -65,6 +59,9 @@ public class StanfordTokenizerES implements StanfordTokenizer {
      WRB Whadverb
      */
 
+    private static final Logger LOG = LoggerFactory.getLogger(StanfordAnnotatorES.class);
+
+    //adding extra terms to standard lucene listByExtension
     //adding extra terms to standard lucene listByExtension
     private static final String customStopWordList = "" +
             "alguna" +
@@ -242,16 +239,24 @@ public class StanfordTokenizerES implements StanfordTokenizer {
             "vosotros" +
             "voy" +
             "yo";
-    private final Escaper escaper;
+
+    private final Escaper escaper = Escapers.builder()
+            .addEscape('\'',"_")
+            .addEscape('('," ")
+            .addEscape(')'," ")
+            .addEscape('['," ")
+            .addEscape(']'," ")
+            .build();
 
     private StanfordCoreNLP pipeline;
 
-    public StanfordTokenizerES(){
+    @PostConstruct
+    public void setup(){
         Properties props;
         props = new Properties();
         //props.put("annotators", "tokenize, cleanxml, ssplit, pos, lemma, stopword"); //"tokenize, ssplit, pos,
         // lemma, ner, parse, dcoref"
-        props.put("annotators", "tokenize, ssplit, pos, lemma, stopword"); //"tokenize, ssplit, pos,
+        props.put("annotators", "tokenize, ssplit, pos, lemma, stopword, ner"); //"tokenize, ssplit, pos,
 
         // Custom sentence split
         props.setProperty("ssplit.boundaryTokenRegex", "[.]|[!?]+|[。]|[！？]+");
@@ -273,42 +278,18 @@ public class StanfordTokenizerES implements StanfordTokenizer {
         // Parallel
         //props.put("threads", "8");
         pipeline = new StanfordCoreNLP(props);
-
-        escaper = Escapers.builder()
-                .addEscape('\'',"_")
-                .addEscape('(',"")
-                .addEscape(')',"")
-                .addEscape('[',"")
-                .addEscape(']',"")
-                .build();    }
-
-
-    public List<Token> tokenize(String text)
-    {
-        // List of tokens
-        List<Token> tokens = new ArrayList<>();
-
-        // Create an empty Annotation just with the given text
-        Annotation document = new Annotation(text);
-
-        // run all Annotators on this text
-        pipeline.annotate(document);
-
-        // Iterate over all of the sentences found
-        List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
-        for(CoreMap sentence: sentences) {
-            // Iterate over all tokens in a sentence
-            for (CoreLabel coreLabel: sentence.get(CoreAnnotations.TokensAnnotation.class)) {
-                Token token = new Token();
-                token.setPos(coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class).toLowerCase());
-                token.setLemma(escaper.escape(coreLabel.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase()));
-                token.setWord(coreLabel.get(CoreAnnotations.TextAnnotation.class).toLowerCase());
-                token.setStopWord(coreLabel.get(StopWordAnnotatorWrapper.class).first);
-                tokens.add(token);
-            }
-        }
-        return tokens;
     }
 
+    public Annotation annotate(String text){
+        // Create an empty Annotation just with the given text
+        Annotation annotation = new Annotation(text);
 
+        // run all Annotators on this text
+        Instant start = Instant.now();
+        pipeline.annotate(annotation);
+        Instant end = Instant.now();
+        LOG.debug("parsing elapsed time: " + Duration.between(start,end).toMillis() + "msecs");
+
+        return annotation;
+    }
 }

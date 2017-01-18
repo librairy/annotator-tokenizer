@@ -17,18 +17,16 @@ import java.io.Serializable;
 @Data
 public class Token implements Serializable {
 
-    String word;
+    String word = "";
 
-    String pos;
-
-    String lemma;
+    String pos = "n";
 
     boolean stopWord;
     boolean isEntity = false;
 
     public boolean isValid(){
         return !stopWord
-                && lemma.length()>2
+                && word.length()>2
                 && pos.toLowerCase().startsWith("n");
     }
 

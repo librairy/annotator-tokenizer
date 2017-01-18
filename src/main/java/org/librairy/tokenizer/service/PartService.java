@@ -1,5 +1,7 @@
 package org.librairy.tokenizer.service;
 
+import com.google.common.base.Strings;
+import edu.stanford.nlp.pipeline.Annotation;
 import org.librairy.boot.model.Event;
 import org.librairy.boot.model.domain.resources.Part;
 import org.librairy.boot.model.domain.resources.Resource;
@@ -11,15 +13,15 @@ import org.librairy.boot.storage.dao.ParametersDao;
 import org.librairy.boot.storage.dao.PartsDao;
 import org.librairy.boot.storage.exception.DataNotFound;
 import org.librairy.boot.storage.executor.ParallelExecutor;
-import org.librairy.tokenizer.annotator.Language;
-import org.librairy.tokenizer.annotator.Tokenizer;
-import org.librairy.tokenizer.annotator.TokenizerFactory;
+import org.librairy.tokenizer.annotator.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,16 +44,14 @@ public class PartService {
     @Autowired
     AnnotationsDao annotationsDao;
 
-    private ParallelExecutor executor;
+    @Autowired
+    Annotator annotator;
 
-    @PostConstruct
-    public void setup(){
-        this.executor = new ParallelExecutor();
-    }
-
+    @Autowired
+    Worker worker;
 
     public void handleParallel(String partUri){
-        executor.execute(() -> handle(partUri));
+        worker.run(() -> handle(partUri));
     }
 
     public void handle(String partUri){
@@ -65,16 +65,42 @@ public class PartService {
         try{
             Part part = optResource.get().asPart();
 
-            //TODO handle language in PARTs
-            tokenizers.parallelStream().forEach(tokenizer -> {
-                Stream<String> tokens = tokenizer.tokenize(part.getContent(),Language.EN)
-                        .stream()
-                        .filter(token -> token.isValid())
-                        .map(token -> token.getLemma())
-                        ;
+            LOG.info("Parsing '" + partUri + "' ...");
 
-                LOG.info("Parsed '" + partUri + "' to " + tokens.count() + " " + tokenizer.getMode());
-                annotationsDao.saveOrUpdate(part.getUri(), tokenizer.getMode(), tokens.collect(Collectors.joining(",")));
+
+            String content = part.getContent();
+
+            if (Strings.isNullOrEmpty(content)){
+                LOG.info("No content found by uri: '" + partUri + "'");
+                return;
+            }
+
+            //TODO handle language in PARTs
+            Instant startAnnotation = Instant.now();
+            Annotation annotation = annotator.annotate(content, Language.EN);
+            Instant endAnnotation = Instant.now();
+            LOG.info("Annotated '" + partUri + "' in: " +
+                    ChronoUnit.MINUTES.between(startAnnotation,endAnnotation) + "min " +
+                    (ChronoUnit.SECONDS.between(startAnnotation,endAnnotation)%60) + "secs");
+
+            tokenizers.stream().forEach(tokenizer -> {
+               try{
+                   Instant start = Instant.now();
+                   List<Token> tokenList = tokenizer.tokenize(annotation);
+                   Instant end = Instant.now();
+                   String tokens = tokenList
+                            .stream()
+                            .filter(token -> token.isValid())
+                            .map(token -> token.getWord())
+                            .collect(Collectors.joining(" "))
+                            ;
+
+                   LOG.info("Parsed '" + partUri + "' to " + tokenList.size() + " " + tokenizer.getMode() + " in: " +
+                           ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
+                    annotationsDao.saveOrUpdate(part.getUri(), tokenizer.getMode(), tokens);
+               }catch (Exception e){
+                LOG.error("Error tokenizing <" + tokenizer.getMode() + "> in " + partUri, e);
+                }
             });
 
         }catch (Exception e){

@@ -1,33 +1,16 @@
 package org.librairy.tokenizer.annotator;
 
+import edu.stanford.nlp.pipeline.Annotation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.librairy.boot.model.domain.resources.Item;
-import org.librairy.boot.model.domain.resources.Resource;
-import org.librairy.boot.storage.UDM;
 import org.librairy.tokenizer.Config;
-import org.librairy.tokenizer.service.ItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.Label;
-import edu.stanford.nlp.ling.Sentence;
-import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
-import edu.stanford.nlp.trees.Dependency;
-import edu.stanford.nlp.trees.GrammaticalStructure;
-import edu.stanford.nlp.trees.GrammaticalStructureFactory;
-import edu.stanford.nlp.trees.PennTreebankLanguagePack;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreePrint;
-import edu.stanford.nlp.trees.TreebankLanguagePack;
-import edu.stanford.nlp.trees.TypedDependency;
-
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +23,8 @@ public class TokenizerTest {
     private static final Logger LOG = LoggerFactory.getLogger(TokenizerTest.class);
 
 
+    @Autowired
+    Annotator annotator;
 
     @Autowired
     TokenizerFactory tokenizerFactory;
@@ -55,7 +40,10 @@ public class TokenizerTest {
         
         
         Language language = Language.EN;
-        List<String> tokens = tokenizerFactory.of(tokenizerMode).tokenize(example, language).stream().
+
+        Annotation annotation = annotator.annotate(example, language);
+
+        List<String> tokens = tokenizerFactory.of(tokenizerMode).tokenize(annotation).stream().
                 map(token -> token.getWord()).collect(Collectors.toList());
 
         LOG.info("Tokens: " + tokens);

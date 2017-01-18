@@ -24,6 +24,6 @@ public class TokenizerConfig {
     @Bean
     @ConditionalOnMissingBean
     public Tokenizer defaultTokenizer(){
-        return new DefaultTokenizer();
+        return new LemmaTokenizer();
     }
 }

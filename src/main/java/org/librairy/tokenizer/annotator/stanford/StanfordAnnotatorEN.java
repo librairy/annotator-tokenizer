@@ -1,29 +1,23 @@
-/*
- * Copyright (c) 2016. Universidad Politecnica de Madrid
- *
- * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
- *
- */
-
 package org.librairy.tokenizer.annotator.stanford;
 
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
-import edu.stanford.nlp.ling.CoreLabel;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.util.CoreMap;
-import org.librairy.tokenizer.annotator.Token;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import javax.annotation.PostConstruct;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Properties;
 
 /**
- * Created by cbadenes on 07/01/16.
+ * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
-public class StanfordTokenizerEntityEN implements StanfordTokenizer {
+@Component
+public class StanfordAnnotatorEN {
 
     /**
      *
@@ -65,6 +59,8 @@ public class StanfordTokenizerEntityEN implements StanfordTokenizer {
      WRB Whadverb
      */
 
+    private static final Logger LOG = LoggerFactory.getLogger(StanfordAnnotatorEN.class);
+
     //adding extra terms to standard lucene listByExtension
     private static final String customStopWordList = "" +
             ".,a,also,an,and,any,are,as,at," +
@@ -85,15 +81,23 @@ public class StanfordTokenizerEntityEN implements StanfordTokenizer {
             "take,that,than,the,their,then,there,thereby,these,they,this,to,tool," +
             "use,up,"+
             "was,we,where,which,widely,will,with,yet";
+    private final Escaper escaper = Escapers.builder()
+            .addEscape('\'',"_")
+            .addEscape('('," ")
+            .addEscape(')'," ")
+            .addEscape('['," ")
+            .addEscape(']'," ")
+            .build();
 
     private StanfordCoreNLP pipeline;
 
-    public StanfordTokenizerEntityEN(){
+    @PostConstruct
+    public void setup(){
         Properties props;
         props = new Properties();
         //props.put("annotators", "tokenize, cleanxml, ssplit, pos, lemma, stopword"); //"tokenize, ssplit, pos,
         // lemma, ner, parse, dcoref"
-        props.put("annotators", "tokenize, ssplit, pos, lemma, stopword, ner"); //"tokenize, ssplit, pos, depparse
+        props.put("annotators", "tokenize, ssplit, pos, lemma, stopword, ner"); //"tokenize, ssplit, pos,
 
         // Custom sentence split
         props.setProperty("ssplit.boundaryTokenRegex", "[.]|[!?]+|[。]|[！？]+");
@@ -114,70 +118,16 @@ public class StanfordTokenizerEntityEN implements StanfordTokenizer {
         pipeline = new StanfordCoreNLP(props);
     }
 
-
-    public List<Token> tokenize(String text)
-    {
-        // List of tokens
-        List<Token> tokens = new ArrayList<>();
-
+    public Annotation annotate(String text){
         // Create an empty Annotation just with the given text
-        Annotation document = new Annotation(text);
+        Annotation annotation = new Annotation(text);
 
         // run all Annotators on this text
-        pipeline.annotate(document);
-        
-        // Iterate over all of the sentences found
-        List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
-        for(CoreMap sentence: sentences) {
-        	        	
-            // Iterate over all tokens in a sentence
-        	
-        	String previousEntity = "";
-        	String previousType = "O";
+        Instant start = Instant.now();
+        pipeline.annotate(annotation);
+        Instant end = Instant.now();
+        LOG.debug("parsing elapsed time: " + Duration.between(start,end).toMillis() + "msecs");
 
-        	
-        	
-            for (CoreLabel coreLabel: sentence.get(CoreAnnotations.TokensAnnotation.class)) {
-            	
-            	String currentType = coreLabel.get(NamedEntityTagAnnotation.class);
-
-            	if (!currentType.equals("O")){
-            		if (previousType.equals(currentType)){
-            			previousEntity = previousEntity + "_" + coreLabel.get(CoreAnnotations.TextAnnotation.class);
-            		}
-            		else{
-            			previousEntity = coreLabel.get(CoreAnnotations.TextAnnotation.class);
-            			previousType = coreLabel.get(NamedEntityTagAnnotation.class);
-            		}
-            	}
-            	else{
-            		if (!previousType.equals("O")){
-            			 Token token = new Token();
-                         token.setWord(previousEntity);
-                         token.setLemma(previousType);
-                         token.setEntity(true);
-                         tokens.add(token);
-                         
-                     	 previousEntity = "";
-                     	 previousType = "O";
-            		}
-            		
-            		
-            	}
-            }
-    		if (!previousType.equals("O")){
-   			 Token token = new Token();
-                token.setWord(previousEntity);
-                token.setLemma(previousType);
-                token.setEntity(true);
-                tokens.add(token);
-                
-    		}
-            
-            
-        }
-        return tokens;
+        return annotation;
     }
-
-
 }

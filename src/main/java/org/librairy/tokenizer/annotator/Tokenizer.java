@@ -7,6 +7,8 @@
 
 package org.librairy.tokenizer.annotator;
 
+import edu.stanford.nlp.pipeline.Annotation;
+
 import java.util.List;
 
 /**
@@ -16,7 +18,7 @@ import java.util.List;
  */
 public interface Tokenizer {
 
-    List<Token> tokenize(String text, Language language);
+    List<Token> tokenize(Annotation annotation);
 
     String getMode();
 }

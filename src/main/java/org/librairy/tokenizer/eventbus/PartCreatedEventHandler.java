@@ -1,7 +1,6 @@
 package org.librairy.tokenizer.eventbus;
 
 import org.librairy.boot.model.Event;
-import org.librairy.boot.model.domain.relations.Relation;
 import org.librairy.boot.model.domain.resources.Resource;
 import org.librairy.boot.model.modules.BindingKey;
 import org.librairy.boot.model.modules.EventBus;
@@ -42,10 +41,9 @@ public class PartCreatedEventHandler implements EventBusSubscriber {
     public void handle(Event event) {
         LOG.debug("event received: " + event);
         try{
-
             Resource resource = event.to(Resource.class);
             service.handleParallel(resource.getUri());
-
+            LOG.info("ACK sent!! [" + resource.getUri()+"]");
         } catch (RuntimeException e){
             LOG.warn(e.getMessage());
         }catch (Exception e){
