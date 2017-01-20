@@ -42,6 +42,6 @@ public class LemmaTokenizer implements Tokenizer{
 
     @Override
     public String getMode() {
-        return "lemmatization";
+        return "lemma";
     }
 }

@@ -43,7 +43,7 @@ public class PartCreatedEventHandler implements EventBusSubscriber {
         try{
             Resource resource = event.to(Resource.class);
             service.handleParallel(resource.getUri());
-            LOG.info("ACK sent!! [" + resource.getUri()+"]");
+            LOG.debug("ACK sent!! [" + resource.getUri()+"]");
         } catch (RuntimeException e){
             LOG.warn(e.getMessage());
         }catch (Exception e){
