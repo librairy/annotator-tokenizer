@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Component
+@Component
 public class EntityTokenizer implements Tokenizer{
 
     private static final Logger LOG = LoggerFactory.getLogger(EntityTokenizer.class);

@@ -83,6 +83,10 @@ public class StanfordCompoundTokenizer {
         List<CoreMap> sentences = annotation.get(CoreAnnotations.SentencesAnnotation.class);
         Integer size = sentences.size();
         AtomicInteger counter = new AtomicInteger(0);
+        
+        TreebankLanguagePack tlp = new PennTreebankLanguagePack();
+        GrammaticalStructureFactory gsf = tlp.grammaticalStructureFactory();
+
 
         sentences.parallelStream().forEach(sentence -> {
             LOG.debug("Sentence: " + counter.getAndIncrement() + " from " + size);
@@ -90,10 +94,8 @@ public class StanfordCompoundTokenizer {
 
             // List<CoreLabel> rawWords = Sentence.toCoreLabelList(sentence);
             Tree parse = lp.apply(sentenceTokens);
-            TreebankLanguagePack tlp = new PennTreebankLanguagePack();
-            GrammaticalStructureFactory gsf = tlp.grammaticalStructureFactory();
             GrammaticalStructure gs = gsf.newGrammaticalStructure(parse);
-            List<TypedDependency> tdl = gs.typedDependenciesCCprocessed();
+            List<TypedDependency> tdl = gs.typedDependenciesCCprocessed(GrammaticalStructure.Extras.NONE);
             //System.out.println(tdl);
             // TreePrint tp = new TreePrint("penn,typedDependenciesCollapsed");
             //tp.printTree(parse);
