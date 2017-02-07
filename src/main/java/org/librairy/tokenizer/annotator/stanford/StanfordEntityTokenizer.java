@@ -98,12 +98,10 @@ public class StanfordEntityTokenizer {
             String previousEntity = "";
             String previousType = "O";
 
-            List<CoreLabel> tokensUnfilter = sentence.get(CoreAnnotations.TokensAnnotation.class);
-            System.out.println("Number of Tokens: " +tokensUnfilter.size());
             for (CoreLabel coreLabel: sentence.get(CoreAnnotations.TokensAnnotation.class)) {
 
                 String currentType = coreLabel.get(NamedEntityTagAnnotation.class);
-                System.out.println(currentType + "  " + coreLabel.get(CoreAnnotations.TextAnnotation.class));
+                //System.out.println(currentType + "  " + coreLabel.get(CoreAnnotations.TextAnnotation.class));
                 
                 if (currentType !=null){
 	                if (!currentType.equals("O") && isValidEntity(currentType)){
