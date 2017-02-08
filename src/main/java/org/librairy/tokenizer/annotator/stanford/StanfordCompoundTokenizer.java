@@ -39,6 +39,7 @@ public class StanfordCompoundTokenizer {
 
     private static final Logger LOG = LoggerFactory.getLogger(StanfordCompoundTokenizer.class);
 
+    private int maxNumChars = 100;
 
 //    private StanfordCoreNLP pipeline;
     private LexicalizedParser lp;
@@ -88,7 +89,8 @@ public class StanfordCompoundTokenizer {
         GrammaticalStructureFactory gsf = tlp.grammaticalStructureFactory();
 
 
-        sentences.parallelStream().forEach(sentence -> {
+        sentences.parallelStream().filter(sentence -> sentence.get(CoreAnnotations.TokensAnnotation.class).toString().length() < maxNumChars).
+        forEach(sentence -> {
             LOG.debug("Sentence: " + counter.getAndIncrement() + " from " + size);
             List<CoreLabel> sentenceTokens = sentence.get(TokensAnnotation.class);
 

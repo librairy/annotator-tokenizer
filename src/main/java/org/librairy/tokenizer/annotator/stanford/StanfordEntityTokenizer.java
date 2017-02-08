@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -32,7 +33,7 @@ public class StanfordEntityTokenizer {
 
 	
     private StanfordCoreNLP pipeline;
-
+    private int maxNumChars = 4500;
     
     //adding extra terms to standard lucene listByExtension
     private static final String customStopWordList = "" +
@@ -87,13 +88,34 @@ public class StanfordEntityTokenizer {
         // List of tokens
         ConcurrentLinkedQueue<Token> tokens = new ConcurrentLinkedQueue<Token>();
 
+        
+        //Delete very long sentences
+        List<CoreMap> sentencesIni = annotation.get(CoreAnnotations.SentencesAnnotation.class).parallelStream().filter(sentence -> sentence.get(CoreAnnotations.TokensAnnotation.class).toString().length() < maxNumChars).collect(Collectors.toList());
+
+        
+        
+        annotation = new Annotation(sentencesIni);
+		//long startTime = System.nanoTime();
         pipeline.annotate(annotation);
+        //long estimatedTime = System.nanoTime() - startTime;
+        //System.out.println("Pipeline Elapsed time: " + estimatedTime);
+
+        
+
+        
 
         
         // Iterate over all of the sentences found
         List<CoreMap> sentences = annotation.get(CoreAnnotations.SentencesAnnotation.class);
-        sentences.parallelStream().forEach(sentence -> {
-
+        sentences.parallelStream().
+        forEach(sentence -> {
+        	
+        	
+        	/*Set<Class<?>> allkey = sentence.keySet();
+        	Iterator<Class<?>> iteratorkey = allkey.iterator();
+        	while (iteratorkey.hasNext()){
+        		System.out.println(iteratorkey.next());
+        	}*/
             // Iterate over all tokens in a sentence
             String previousEntity = "";
             String previousType = "O";
