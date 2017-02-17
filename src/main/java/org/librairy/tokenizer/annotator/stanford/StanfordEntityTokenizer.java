@@ -163,7 +163,7 @@ public class StanfordEntityTokenizer {
     }
 
 	private boolean isValidEntity(String currentType) {
-		if (currentType.equals("O") || currentType.equals("DATE") || currentType.equals("NUMBER")|| currentType.equals("ORDINAL") || currentType.equals("LOCATION")  || currentType.equals("SET")  || currentType.equals("LOCATION")  || currentType.equals("DURATION"))
+		if (currentType.equals("O") || currentType.equals("DATE") || currentType.equals("NUMBER")|| currentType.equals("ORDINAL") || currentType.equals("LOCATION")  || currentType.equals("SET")  || currentType.equals("MISC")  || currentType.equals("DURATION"))
 			return false;
 		return true;
 	}

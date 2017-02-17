@@ -28,6 +28,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -109,22 +110,22 @@ public class StanfordCompoundTokenizer {
 
             for (TypedDependency d : tdl){
                 if (d.reln().getShortName().equals("compound")){
-
-                    Token token = new Token();
-                    token.setWord(d.dep().word() + "_" +d.gov().word());
-                    token.setStopWord(false);
-                    tokens.add(token);
-                    if(prevD != null){
-                        IndexedWord preGov = prevD.gov();
-                        IndexedWord dGov = d.gov();
-                        if(preGov!= null && dGov != null && !Strings.isNullOrEmpty(preGov.word()) && !Strings.isNullOrEmpty(dGov.word()) && preGov.word().equals(dGov.word())){
-                            Token tokenTri = new Token();
-                            tokenTri.setWord(prevD.dep().word() +"_"+d.dep().word() + "_" +d.gov().word());
-                            tokenTri.setStopWord(false);
-                            tokens.add(tokenTri);
-                        }
-                    }
-
+	                	if (isValidGram(d.dep().word()) && isValidGram(d.gov().word())) {
+	                    Token token = new Token();
+	                    token.setWord(d.dep().word() + "_" +d.gov().word());
+	                    token.setStopWord(false);
+	                    tokens.add(token);
+	                    if(prevD != null){
+	                        IndexedWord preGov = prevD.gov();
+	                        IndexedWord dGov = d.gov();
+	                        if(preGov!= null && dGov != null && !Strings.isNullOrEmpty(preGov.word()) && !Strings.isNullOrEmpty(dGov.word()) && preGov.word().equals(dGov.word())){
+	                            Token tokenTri = new Token();
+	                            tokenTri.setWord(prevD.dep().word() +"_"+d.dep().word() + "_" +d.gov().word());
+	                            tokenTri.setStopWord(false);
+	                            tokens.add(tokenTri);
+	                        }
+	                    }
+                	}
                 }
                 prevD = d;
             }
@@ -132,6 +133,19 @@ public class StanfordCompoundTokenizer {
 
         return StreamSupport.stream(tokens.spliterator(), false).collect(Collectors.toList());
     }
+
+
+	private boolean isValidGram(String word) {
+		
+		//single downcased letter
+		if (word.length() ==1){
+			if (Pattern.matches("[a-z]", word)){
+				return false;
+			}
+		}
+		
+		return true;
+	}
 
 
 
