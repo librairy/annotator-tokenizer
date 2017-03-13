@@ -32,7 +32,7 @@ import java.util.stream.StreamSupport;
 public class StanfordEntityTokenizer {
 
 	
-    private StanfordCoreNLP pipeline;
+//    private StanfordCoreNLP pipeline;
     private int maxNumChars = 4500;
     
     //adding extra terms to standard lucene listByExtension
@@ -57,29 +57,29 @@ public class StanfordEntityTokenizer {
             "was,we,where,which,widely,will,with,yet";
     
 	public StanfordEntityTokenizer(){
-        Properties props;
-        props = new Properties();
-        //props.put("annotators", "tokenize, cleanxml, ssplit, pos, lemma, stopword"); //"tokenize, ssplit, pos,
-        // lemma, ner, parse, dcoref"
-        props.put("annotators", "tokenize, ssplit, pos, lemma, stopword, ner"); //"tokenize, ssplit, pos, depparse
-
-        // Custom sentence split
-        props.setProperty("ssplit.boundaryTokenRegex", "[.]|[!?]+|[。]|[！？]+");
-
-        // Custom tokenize
-        //props.setProperty("tokenize.options","untokenizable=allDelete,normalizeOtherBrackets=false," +
+//        Properties props;
+//        props = new Properties();
+//        //props.put("annotators", "tokenize, cleanxml, ssplit, pos, lemma, stopword"); //"tokenize, ssplit, pos,
+//        // lemma, ner, parse, dcoref"
+//        props.put("annotators", "tokenize, ssplit, pos, lemma, stopword, ner"); //"tokenize, ssplit, pos, depparse
+//
+//        // Custom sentence split
+//        props.setProperty("ssplit.boundaryTokenRegex", "[.]|[!?]+|[。]|[！？]+");
+//
+//        // Custom tokenize
+//        //props.setProperty("tokenize.options","untokenizable=allDelete,normalizeOtherBrackets=false," +
+////                "normalizeParentheses=false");
+//        props.setProperty("tokenize.options","untokenizable=noneDelete,normalizeOtherBrackets=false," +
 //                "normalizeParentheses=false");
-        props.setProperty("tokenize.options","untokenizable=noneDelete,normalizeOtherBrackets=false," +
-                "normalizeParentheses=false");
-
-        // Custom stopwords
-//        props.setProperty("customAnnotatorClass.stopword", "intoxicant.analytics.coreNlp.StopwordAnnotator");
-        props.setProperty("customAnnotatorClass.stopword", StopWordAnnotatorWrapper.class.getCanonicalName());
-        props.setProperty(StopWordAnnotatorWrapper.STOPWORDS_LIST, customStopWordList);
-
-        // Parallel
-        //props.put("threads", "8");
-        pipeline = new StanfordCoreNLP(props);
+//
+//        // Custom stopwords
+////        props.setProperty("customAnnotatorClass.stopword", "intoxicant.analytics.coreNlp.StopwordAnnotator");
+//        props.setProperty("customAnnotatorClass.stopword", StopWordAnnotatorWrapper.class.getCanonicalName());
+//        props.setProperty(StopWordAnnotatorWrapper.STOPWORDS_LIST, customStopWordList);
+//
+//        // Parallel
+//        //props.put("threads", "8");
+//        pipeline = new StanfordCoreNLP(props);
 	}
 
     public List<Token> tokenize(Annotation annotation)
@@ -89,16 +89,16 @@ public class StanfordEntityTokenizer {
         ConcurrentLinkedQueue<Token> tokens = new ConcurrentLinkedQueue<Token>();
 
         
-        //Delete very long sentences
-        List<CoreMap> sentencesIni = annotation.get(CoreAnnotations.SentencesAnnotation.class).parallelStream().filter(sentence -> sentence.get(CoreAnnotations.TokensAnnotation.class).toString().length() < maxNumChars).collect(Collectors.toList());
-
-        
-        
-        annotation = new Annotation(sentencesIni);
-		//long startTime = System.nanoTime();
-        pipeline.annotate(annotation);
-        //long estimatedTime = System.nanoTime() - startTime;
-        //System.out.println("Pipeline Elapsed time: " + estimatedTime);
+//        //Delete very long sentences
+//        List<CoreMap> sentencesIni = annotation.get(CoreAnnotations.SentencesAnnotation.class).parallelStream().filter(sentence -> sentence.get(CoreAnnotations.TokensAnnotation.class).toString().length() < maxNumChars).collect(Collectors.toList());
+//
+//
+//
+//        annotation = new Annotation(sentencesIni);
+//		//long startTime = System.nanoTime();
+//        pipeline.annotate(annotation);
+//        //long estimatedTime = System.nanoTime() - startTime;
+//        //System.out.println("Pipeline Elapsed time: " + estimatedTime);
 
         
 

@@ -15,7 +15,7 @@ import org.springframework.context.annotation.PropertySource;
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
 @Configuration("org.librairy.tokenizer")
-@ComponentScan({"org.librairy.tokenizer.annotator"})
-//@PropertySource({"classpath:boot.properties"})
+@ComponentScan({"org.librairy.tokenizer.annotator", "org.librairy.boot"})
+@PropertySource({"classpath:boot.properties"})
 public class Config {
 }

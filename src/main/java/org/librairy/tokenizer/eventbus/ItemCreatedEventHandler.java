@@ -32,7 +32,7 @@ public class ItemCreatedEventHandler implements EventBusSubscriber {
     public void init(){
         RoutingKey routingKey = RoutingKey.of(Resource.Type.ITEM, Resource.State.CREATED);
         LOG.info("Trying to register as subscriber of '" + routingKey + "' events ..");
-        eventBus.subscribe(this, BindingKey.of(routingKey, "tokenizer-item"));
+        eventBus.subscribe(this, BindingKey.of(routingKey, "tokenizer.item.added"));
         LOG.info("registered successfully");
     }
 

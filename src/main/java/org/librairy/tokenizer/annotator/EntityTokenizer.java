@@ -30,7 +30,7 @@ public class EntityTokenizer implements Tokenizer{
             LOG.debug("Tokenizing text by '" + getMode() + "'");
             return tokenizer.tokenize(annotation);
         } catch (Exception e) {
-            LOG.error("Error extracting tokens from annotation: " + annotation + " ...",e);
+            LOG.error("Error extracting ner tokens",e);
             return new ArrayList<>();
         }
     }

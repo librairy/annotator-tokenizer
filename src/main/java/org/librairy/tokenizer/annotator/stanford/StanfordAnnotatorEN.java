@@ -95,10 +95,17 @@ public class StanfordAnnotatorEN {
     public void setup(){
         Properties props;
         props = new Properties();
-        //props.put("annotators", "tokenize, cleanxml, ssplit, pos, lemma, stopword"); //"tokenize, ssplit, pos,
-        // lemma, ner, parse, dcoref"
+        //props.put("annotators", "tokenize, cleanxml, ssplit, pos, lemma, stopword"); //"tokenize, ssplit, pos, lemma, ner, parse, dcoref"
         //props.put("annotators", "tokenize, ssplit, pos, lemma, stopword, ner"); //"tokenize, ssplit, pos,
-        props.put("annotators", "tokenize, ssplit, pos, lemma, stopword"); //"tokenize, ssplit, pos,
+        props.put("annotators", "tokenize, ssplit, pos, lemma, stopword, ner"); //"tokenize, ssplit, pos,
+
+        // Max length
+        props.setProperty("parse.maxlen","100");
+
+        // The rule-based SUTime and tokensregex NER is actually considerably slower than the statistical CRF NER.
+        props.setProperty("ner.useSUTime", "false");
+        props.setProperty("ner.applyNumericClassifiers", "false");
+
 
         // Custom sentence split
         props.setProperty("ssplit.boundaryTokenRegex", "[.]|[!?]+|[。]|[！？]+");
@@ -106,8 +113,7 @@ public class StanfordAnnotatorEN {
         // Custom tokenize
         //props.setProperty("tokenize.options","untokenizable=allDelete,normalizeOtherBrackets=false," +
 //                "normalizeParentheses=false");
-        props.setProperty("tokenize.options","untokenizable=noneDelete,normalizeOtherBrackets=false," +
-                "normalizeParentheses=false");
+        props.setProperty("tokenize.options","untokenizable=noneDelete,normalizeOtherBrackets=false,normalizeParentheses=false");
 
         // Custom stopwords
 //        props.setProperty("customAnnotatorClass.stopword", "intoxicant.analytics.coreNlp.StopwordAnnotator");

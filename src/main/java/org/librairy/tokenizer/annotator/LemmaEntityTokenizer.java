@@ -49,7 +49,7 @@ public class LemmaEntityTokenizer implements Tokenizer{
             return lemmaTokens;
 
         } catch (Exception e) {
-            LOG.error("Error extracting tokens from annotation: " + annotation + " ...",e);
+            LOG.error("Error extracting lemma-entity tokens",e);
             return new ArrayList<>();
         }
     }

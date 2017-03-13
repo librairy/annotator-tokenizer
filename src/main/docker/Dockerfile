@@ -1,18 +1,6 @@
-FROM frolvlad/alpine-oraclejdk8:slim
+FROM openjdk:8-jre-alpine
 MAINTAINER Librairy <librairy.framework@gmail.com>
-
-RUN apk --update add git tar bash
-
-ENV LIBRAIRY_HOME /librairy
-
 VOLUME /tmp
-VOLUME /librairy
-
-ADD waitFor.sh /
-RUN chmod +x /waitFor.sh
-
 ADD annotator-tokenizer.jar app.jar
-
 RUN sh -c 'touch /app.jar'
-
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT exec java $JAVA_OPTS -server -jar /app.jar

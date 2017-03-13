@@ -20,8 +20,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -73,34 +74,58 @@ public class ItemService {
             }
 
 
-            LOG.info("Annotating '" + itemUri + "' ...");
-            Instant startAnnotation = Instant.now();
-            Annotation annotation = annotator.annotate(content, Language.from(item.getLanguage()));
-            Instant endAnnotation = Instant.now();
-            LOG.info("Annotated '" + itemUri + "' in: " +
-                    ChronoUnit.MINUTES.between(startAnnotation,endAnnotation) + "min " +
-                    (ChronoUnit.SECONDS.between(startAnnotation,endAnnotation)%60) + "secs");
+            Instant start = Instant.now();
 
-            tokenizers.stream().forEach(tokenizer -> {
-                try{
-                    Instant start = Instant.now();
-                    List<Token> tokenList = tokenizer.tokenize(annotation);
-                    Instant end = Instant.now();
-                    String tokens = tokenList
-                            .stream()
-                            .filter(token -> token.isValid())
-                            .map(token -> token.getWord())
-                            .collect(Collectors.joining(" "))
-                            ;
+            Matcher matcher = Pattern.compile(".{1,1000}(,|.$)").matcher(content);
+            Map<String,StringBuilder> tokenMap = new HashMap<String,StringBuilder>();
+            while (matcher.find()){
 
-                    LOG.info("Parsed '" + itemUri + "' to " + tokenList.size() + " " + tokenizer.getMode() + " in: " +
-                            ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
-                    annotationsDao.saveOrUpdate(item.getUri(), tokenizer.getMode(), tokens);
-                }catch (Exception e){
-                    LOG.error("Error tokenizing <" + tokenizer.getMode() + "> in " + itemUri, e);
-                }
+                String partialContent = matcher.group();
+                LOG.debug("Annotating '" + itemUri + "' ...");
+                Instant startAnnotation = Instant.now();
+                Annotation annotation = annotator.annotate(partialContent, Language.from(item.getLanguage()));
+                Instant endAnnotation = Instant.now();
+                LOG.debug("Annotated '" + itemUri + "' in: " +
+                        ChronoUnit.MINUTES.between(startAnnotation,endAnnotation) + "min " +
+                        (ChronoUnit.SECONDS.between(startAnnotation,endAnnotation)%60) + "secs");
+
+                tokenizers.stream().forEach(tokenizer -> {
+                    try{
+                        Instant startTokenizer = Instant.now();
+                        List<Token> tokenList = tokenizer.tokenize(annotation);
+                        Instant endTokenizer = Instant.now();
+                        LOG.debug("Parsed '" + itemUri + "' to " + tokenList.size() + " " + tokenizer.getMode() + " in: " +
+                                ChronoUnit.MINUTES.between(startTokenizer,endTokenizer) + "min " + (ChronoUnit.SECONDS.between(startTokenizer,endTokenizer)%60) + "secs");
+                        String tokens = tokenList
+                                .stream()
+                                .filter(token -> token.isValid())
+                                .map(token -> token.getWord())
+                                .collect(Collectors.joining(" "))
+                                ;
+
+                        StringBuilder accList = tokenMap.get(tokenizer.getMode());
+                        if (accList == null){
+                            accList = new StringBuilder();
+                            tokenMap.put(tokenizer.getMode(), accList);
+                        }
+                        accList.append(" ").append(tokens);
+                        tokenMap.put(tokenizer.getMode(), accList);
+
+                    }catch (Exception e){
+                        LOG.error("Error tokenizing <" + tokenizer.getMode() + "> in " + itemUri, e);
+                    }
+                });
+
+            }
+
+            // Annotate
+            tokenMap.entrySet().stream().forEach(entry -> {
+                annotationsDao.saveOrUpdate(item.getUri(), entry.getKey(), entry.getValue().toString());
             });
 
+
+            Instant end = Instant.now();
+            LOG.debug("Annotated '" + itemUri + "'  in: " + ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
 
         }catch (Exception e){
             LOG.warn("Unexpected error",e);

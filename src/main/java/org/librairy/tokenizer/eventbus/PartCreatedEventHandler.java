@@ -32,7 +32,7 @@ public class PartCreatedEventHandler implements EventBusSubscriber {
     public void init(){
         RoutingKey routingKey = RoutingKey.of(Resource.Type.PART, Resource.State.CREATED);
         LOG.info("Trying to register as subscriber of '" + routingKey + "' events ..");
-        eventBus.subscribe(this, BindingKey.of(routingKey, "tokenizer-part"));
+        eventBus.subscribe(this, BindingKey.of(routingKey, "tokenizer.part.added"));
         LOG.info("registered successfully");
     }
 

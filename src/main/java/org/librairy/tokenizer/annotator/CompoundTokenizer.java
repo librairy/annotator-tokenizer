@@ -29,7 +29,7 @@ public class CompoundTokenizer implements Tokenizer{
         try {
             return tokenizer.tokenize(annotation);
         } catch (Exception e) {
-            LOG.error("Error extracting tokens from annotation: " + annotation + " ...",e);
+            LOG.error("Error extracting compound tokens from annotation",e);
             return new ArrayList<>();
         }
     }

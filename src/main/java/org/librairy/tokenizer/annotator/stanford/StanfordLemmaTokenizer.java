@@ -32,13 +32,7 @@ import java.util.stream.Collectors;
 @Component
 public class StanfordLemmaTokenizer{
 
-    private final Escaper escaper = Escapers.builder()
-            .addEscape('\'',"_")
-            .addEscape('('," ")
-            .addEscape(')'," ")
-            .addEscape('['," ")
-            .addEscape(']'," ")
-            .build();
+
 
 
     public List<Token> tokenize(Annotation annotation)
@@ -50,7 +44,7 @@ public class StanfordLemmaTokenizer{
                 .map(coreLabel -> {
                     Token token = new Token();
                     token.setPos(coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class).toLowerCase());
-                    token.setWord(escaper.escape(coreLabel.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase()));
+                    token.setWord(coreLabel.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase());
                     token.setStopWord(coreLabel.get(StopWordAnnotatorWrapper.class).first);
                     return token;
                 })

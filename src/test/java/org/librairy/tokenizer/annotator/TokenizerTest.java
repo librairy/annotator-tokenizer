@@ -1,40 +1,20 @@
 package org.librairy.tokenizer.annotator;
 
 
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.Label;
-import edu.stanford.nlp.ling.Sentence;
-import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.trees.Dependency;
-import edu.stanford.nlp.trees.GrammaticalStructure;
-import edu.stanford.nlp.trees.GrammaticalStructureFactory;
-import edu.stanford.nlp.trees.PennTreebankLanguagePack;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreePrint;
-import edu.stanford.nlp.trees.TreebankLanguagePack;
-import edu.stanford.nlp.trees.TypedDependency;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.librairy.tokenizer.Config;
+import org.librairy.tokenizer.annotator.stanford.StanfordEntityTokenizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -123,5 +103,11 @@ public class TokenizerTest {
 
         }
 */    }
+
+
+    @Test
+    public void content(){
+
+    }
 
 }
