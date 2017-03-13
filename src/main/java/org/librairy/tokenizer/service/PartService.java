@@ -87,11 +87,11 @@ public class PartService {
             while (matcher.find()){
 
                 String partialContent = matcher.group();
-                LOG.info("Annotating '" + partUri + "' ...");
+                LOG.debug("Annotating '" + partUri + "' ...");
                 Instant startAnnotation = Instant.now();
                 Annotation annotation = annotator.annotate(partialContent, Language.EN);
                 Instant endAnnotation = Instant.now();
-                LOG.info("Annotated '" + partUri + "' in: " +
+                LOG.debug("Annotated '" + partUri + "' in: " +
                         ChronoUnit.MINUTES.between(startAnnotation,endAnnotation) + "min " +
                         (ChronoUnit.SECONDS.between(startAnnotation,endAnnotation)%60) + "secs");
 
@@ -100,7 +100,7 @@ public class PartService {
                         Instant startTokenizer = Instant.now();
                         List<Token> tokenList = tokenizer.tokenize(annotation);
                         Instant endTokenizer = Instant.now();
-                        LOG.info("Parsed '" + partUri + "' to " + tokenList.size() + " " + tokenizer.getMode() + " in: " +
+                        LOG.debug("Parsed '" + partUri + "' to " + tokenList.size() + " " + tokenizer.getMode() + " in: " +
                                 ChronoUnit.MINUTES.between(startTokenizer,endTokenizer) + "min " + (ChronoUnit.SECONDS.between(startTokenizer,endTokenizer)%60) + "secs");
                         String tokens = tokenList
                                 .stream()
@@ -130,7 +130,7 @@ public class PartService {
             });
 
             Instant end = Instant.now();
-            LOG.debug("Annotated '" + partUri + "'  in: " + ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
+            LOG.info("Annotated '" + partUri + "'  in: " + ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
 
         }catch (Exception e){
             LOG.error("Error on tokenizer", e);

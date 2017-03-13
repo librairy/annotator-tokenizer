@@ -125,7 +125,7 @@ public class ItemService {
 
 
             Instant end = Instant.now();
-            LOG.debug("Annotated '" + itemUri + "'  in: " + ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
+            LOG.info("Annotated '" + itemUri + "'  in: " + ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
 
         }catch (Exception e){
             LOG.warn("Unexpected error",e);
