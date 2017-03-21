@@ -62,7 +62,7 @@ public class StanfordAnnotatorEN {
     private static final Logger LOG = LoggerFactory.getLogger(StanfordAnnotatorEN.class);
 
     //adding extra terms to standard lucene listByExtension
-    private static final String customStopWordList = "" +
+    public static final String customStopWordList = "" +
             ".,a,also,an,and,any,are,as,at," +
             "be,become,both,bring,but,by," +
             "can,come," +
@@ -80,7 +80,7 @@ public class StanfordAnnotatorEN {
             "same,show,such," +
             "take,that,than,the,their,then,there,thereby,these,they,this,to,tool," +
             "use,up,"+
-            "was,we,where,which,widely,will,with,yet";
+            "was,we,where,which,widely,will,with,yet,your";
     private final Escaper escaper = Escapers.builder()
             .addEscape('\'',"_")
             .addEscape('('," ")

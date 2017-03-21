@@ -19,12 +19,14 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
 import edu.stanford.nlp.trees.TypedDependency;
 import edu.stanford.nlp.util.CoreMap;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.librairy.tokenizer.annotator.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -112,17 +114,26 @@ public class StanfordCompoundTokenizer {
                 if (d.reln().getShortName().equals("compound")){
 	                	if (isValidGram(d.dep().word()) && isValidGram(d.gov().word())) {
 	                    Token token = new Token();
-	                    token.setWord(d.dep().word() + "_" +d.gov().word());
+                        String word = (isValidWord(d.dep().word()))? d.dep().word() + "_" +d.gov().word() : d.gov().word();
+                            if (Strings.isNullOrEmpty(word)) LOG.warn("Null or empty word!! " + word);
+	                    token.setWord(word);
 	                    token.setStopWord(false);
-	                    tokens.add(token);
+                        if (!Strings.isNullOrEmpty(word)) tokens.add(token);
 	                    if(prevD != null){
 	                        IndexedWord preGov = prevD.gov();
 	                        IndexedWord dGov = d.gov();
 	                        if(preGov!= null && dGov != null && !Strings.isNullOrEmpty(preGov.word()) && !Strings.isNullOrEmpty(dGov.word()) && preGov.word().equals(dGov.word())){
 	                            Token tokenTri = new Token();
-	                            tokenTri.setWord(prevD.dep().word() +"_"+d.dep().word() + "_" +d.gov().word());
+                                String exWord = "";
+                                if (!isValidWord(prevD.dep().word())){
+                                    exWord = d.dep().word() + "_" +d.gov().word();
+                                }else{
+                                    exWord = prevD.dep().word() +"_"+d.dep().word() + "_" +d.gov().word();
+                                }
+	                            tokenTri.setWord(exWord);
 	                            tokenTri.setStopWord(false);
-	                            tokens.add(tokenTri);
+                                if (Strings.isNullOrEmpty(exWord)) LOG.warn("Null or empty word!! " + exWord);
+                                if (!Strings.isNullOrEmpty(exWord))  tokens.add(tokenTri);
 	                        }
 	                    }
                 	}
@@ -147,6 +158,17 @@ public class StanfordCompoundTokenizer {
 		return true;
 	}
 
+
+    private boolean isValidWord(String word){
+        if (Strings.isNullOrEmpty(word)) return false;
+
+        if (Arrays.asList(StanfordAnnotatorEN.customStopWordList.split(",")).contains(word)) return false;
+
+        if (EnglishAnalyzer.getDefaultStopSet().contains(word)) return false;
+
+        return true;
+
+    }
 
 
 

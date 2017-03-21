@@ -7,23 +7,12 @@ x * Copyright (c) 2016. Universidad Politecnica de Madrid
 
 package org.librairy.tokenizer.annotator.stanford;
 
-import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.util.CoreMap;
 import org.librairy.tokenizer.annotator.Token;
-import org.librairy.tokenizer.annotator.Tokenizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**

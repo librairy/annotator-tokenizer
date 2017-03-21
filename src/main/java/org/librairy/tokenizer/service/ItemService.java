@@ -66,6 +66,8 @@ public class ItemService {
 
             Item item = optResource.get().asItem();
 
+            LOG.info("Parsing '" + item.getUri() + "' ...");
+
             String content = item.getContent();
 
             if (Strings.isNullOrEmpty(content)){
