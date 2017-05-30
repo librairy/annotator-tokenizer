@@ -53,7 +53,7 @@
         <!-- Librairy Boot Repository -->
         <repository>
             <id>librairy-test-repo</id>
-            <url>https://raw.github.com/cbadenes/lab/mvn-repo/</url>
+            <url>https://raw.github.com/cbadenes/test-utils/mvn-repo/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
