@@ -3,16 +3,19 @@ package org.librairy.tokenizer.service;
 import com.google.common.base.Strings;
 import edu.stanford.nlp.pipeline.Annotation;
 import org.librairy.boot.model.Event;
+import org.librairy.boot.model.domain.resources.Domain;
 import org.librairy.boot.model.domain.resources.Part;
 import org.librairy.boot.model.domain.resources.Resource;
 import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.RoutingKey;
 import org.librairy.boot.storage.UDM;
 import org.librairy.boot.storage.dao.AnnotationsDao;
+import org.librairy.boot.storage.dao.DomainsDao;
 import org.librairy.boot.storage.dao.ParametersDao;
 import org.librairy.boot.storage.dao.PartsDao;
 import org.librairy.boot.storage.exception.DataNotFound;
 import org.librairy.boot.storage.executor.ParallelExecutor;
+import org.librairy.boot.storage.generator.URIGenerator;
 import org.librairy.tokenizer.annotator.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +56,12 @@ public class PartService {
 
     @Autowired
     Worker worker;
+
+    @Autowired
+    PartsDao partsDao;
+
+    @Autowired
+    DomainsDao domainsDao;
 
     public void handleParallel(String partUri){
         worker.run(() -> handle(partUri));
@@ -95,7 +104,7 @@ public class PartService {
                         ChronoUnit.MINUTES.between(startAnnotation,endAnnotation) + "min " +
                         (ChronoUnit.SECONDS.between(startAnnotation,endAnnotation)%60) + "secs");
 
-                tokenizers.stream().forEach(tokenizer -> {
+                tokenizers.parallelStream().forEach(tokenizer -> {
                     try{
                         Instant startTokenizer = Instant.now();
                         List<Token> tokenList = tokenizer.tokenize(annotation);
@@ -125,12 +134,30 @@ public class PartService {
             }
 
             // Annotate
-            tokenMap.entrySet().stream().forEach(entry -> {
+            tokenMap.entrySet().parallelStream().forEach(entry -> {
                 annotationsDao.saveOrUpdate(part.getUri(), entry.getKey(), entry.getValue().toString());
             });
 
             Instant end = Instant.now();
             LOG.info("Annotated '" + partUri + "'  in: " + ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
+
+            Integer windowSize = 100;
+            Optional<String> offset = Optional.empty();
+            Boolean finished = false;
+
+            while(!finished){
+                List<Domain> domains = partsDao.listDomains(part.getUri(), windowSize, offset);
+
+                for (Domain domain: domains){
+                    domainsDao.updateDomainTokens(domain.getUri(), part.getUri());
+                }
+
+                if (domains.size() < windowSize) break;
+
+                offset = Optional.of(URIGenerator.retrieveId(domains.get(windowSize-1).getUri()));
+
+            }
+
 
         }catch (Exception e){
             LOG.error("Error on tokenizer", e);

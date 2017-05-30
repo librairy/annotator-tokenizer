@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -67,7 +69,7 @@ public class StanfordAnnotatorEN {
             "be,become,both,bring,but,by," +
             "can,come," +
             "do," +
-            "e.g.,example,extend,enough,enhance," +
+            "e.g.,et_al,et.al,example,extend,enough,enhance," +
             "for,from," +
             "give,get,greatly," +
             "have,highly,high," +
@@ -81,6 +83,7 @@ public class StanfordAnnotatorEN {
             "take,that,than,the,their,then,there,thereby,these,they,this,to,tool," +
             "use,up,"+
             "was,we,where,which,widely,will,with,yet,your";
+    public List<String> customStopWord = Arrays.asList(customStopWordList.split(","));
     private final Escaper escaper = Escapers.builder()
             .addEscape('\'',"_")
             .addEscape('('," ")

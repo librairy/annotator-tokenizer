@@ -2,15 +2,16 @@ package org.librairy.tokenizer.service;
 
 import com.google.common.base.Strings;
 import edu.stanford.nlp.pipeline.Annotation;
+import org.librairy.boot.model.domain.resources.Domain;
 import org.librairy.boot.model.domain.resources.Item;
 import org.librairy.boot.model.domain.resources.Resource;
 import org.librairy.boot.storage.UDM;
 import org.librairy.boot.storage.dao.AnnotationsDao;
+import org.librairy.boot.storage.dao.DomainsDao;
+import org.librairy.boot.storage.dao.ItemsDao;
 import org.librairy.boot.storage.executor.ParallelExecutor;
-import org.librairy.tokenizer.annotator.Annotator;
-import org.librairy.tokenizer.annotator.Language;
-import org.librairy.tokenizer.annotator.Token;
-import org.librairy.tokenizer.annotator.Tokenizer;
+import org.librairy.boot.storage.generator.URIGenerator;
+import org.librairy.tokenizer.annotator.*;
 import org.librairy.tokenizer.annotator.stanford.StanfordAnnotatorEN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,14 @@ public class ItemService {
     @Autowired
     Worker worker;
 
+    @Autowired
+    TagAnnotator tagAnnotator;
 
+    @Autowired
+    DomainsDao domainsDao;
+
+    @Autowired
+    ItemsDao itemsDao;
 
     public void handleParallel(String itemUri){
         worker.run(() -> handle(itemUri));
@@ -91,7 +99,7 @@ public class ItemService {
                         ChronoUnit.MINUTES.between(startAnnotation,endAnnotation) + "min " +
                         (ChronoUnit.SECONDS.between(startAnnotation,endAnnotation)%60) + "secs");
 
-                tokenizers.stream().forEach(tokenizer -> {
+                tokenizers.parallelStream().forEach(tokenizer -> {
                     try{
                         Instant startTokenizer = Instant.now();
                         List<Token> tokenList = tokenizer.tokenize(annotation);
@@ -121,13 +129,35 @@ public class ItemService {
             }
 
             // Annotate
-            tokenMap.entrySet().stream().forEach(entry -> {
+            tokenMap.entrySet().parallelStream().forEach(entry -> {
                 annotationsDao.saveOrUpdate(item.getUri(), entry.getKey(), entry.getValue().toString());
             });
+
+            // Annotate Tags
+            annotationsDao.saveOrUpdate(item.getUri(), "tags", tagAnnotator.annotate(tokenMap, Language.from(item.getLanguage())));
+
 
 
             Instant end = Instant.now();
             LOG.info("Annotated '" + itemUri + "'  in: " + ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
+
+
+            Integer windowSize = 100;
+            Optional<String> offset = Optional.empty();
+            Boolean finished = false;
+
+            while(!finished){
+                List<Domain> domains = itemsDao.listDomains(item.getUri(), windowSize, offset);
+
+                for (Domain domain: domains){
+                    domainsDao.updateDomainTokens(domain.getUri(), item.getUri());
+                }
+
+                if (domains.size() < windowSize) break;
+
+                offset = Optional.of(URIGenerator.retrieveId(domains.get(windowSize-1).getUri()));
+
+            }
 
         }catch (Exception e){
             LOG.warn("Unexpected error",e);

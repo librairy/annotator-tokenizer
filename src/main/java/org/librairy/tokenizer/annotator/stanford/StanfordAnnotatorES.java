@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -63,7 +65,7 @@ public class StanfordAnnotatorES {
 
     //adding extra terms to standard lucene listByExtension
     //adding extra terms to standard lucene listByExtension
-    private static final String customStopWordList = "" +
+    public static final String customStopWordList = "" +
             "alguna" +
             "algunas" +
             "alguno" +
@@ -240,6 +242,7 @@ public class StanfordAnnotatorES {
             "voy" +
             "yo";
 
+    public List<String> customStopWord = Arrays.asList(customStopWordList.split(","));
     private final Escaper escaper = Escapers.builder()
             .addEscape('\'',"_")
             .addEscape('('," ")
