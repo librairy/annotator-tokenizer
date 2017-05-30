@@ -29,13 +29,6 @@ import java.util.List;
 @Category(IntegrationTest.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class)
-//@TestPropertySource(properties = {
-//        "librairy.columndb.host = zavijava.dia.fi.upm.es",
-//        "librairy.documentdb.host = zavijava.dia.fi.upm.es",
-//        "librairy.graphdb.host = zavijava.dia.fi.upm.es",
-//        "librairy.eventbus.host = zavijava.dia.fi.upm.es"
-////        "librairy.uri = drinventor.eu" //librairy.org
-//})
 public class ItemServiceTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(ItemServiceTest.class);

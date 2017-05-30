@@ -147,7 +147,7 @@ public class ItemService {
             Boolean finished = false;
 
             while(!finished){
-                List<Domain> domains = itemsDao.listDomains(item.getUri(), windowSize, offset);
+                List<Domain> domains = itemsDao.listDomains(item.getUri(), windowSize, offset, false);
 
                 for (Domain domain: domains){
                     domainsDao.updateDomainTokens(domain.getUri(), item.getUri());

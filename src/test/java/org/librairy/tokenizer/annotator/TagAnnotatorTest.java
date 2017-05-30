@@ -39,13 +39,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Category(IntegrationTest.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class)
-@TestPropertySource(properties = {
-//        "librairy.columndb.host = zavijava.dia.fi.upm.es",
-//        "librairy.documentdb.host = zavijava.dia.fi.upm.es",
-//        "librairy.graphdb.host = zavijava.dia.fi.upm.es",
-//        "librairy.eventbus.host = zavijava.dia.fi.upm.es"
-        "librairy.uri = librairy.linkeddata.es/resources" //librairy.org
-})
 public class TagAnnotatorTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(TagAnnotatorTest.class);
@@ -93,7 +86,7 @@ public class TagAnnotatorTest {
         while(!finished){
 
             LOG.info(round++ + " round!  total docs: " + counter.get());
-            List<Item> items = domainsDao.listDocuments(domainUri, windowSize, id);
+            List<Item> items = domainsDao.listDocuments(domainUri, windowSize, id, false);
 
             items.parallelStream().forEach( item -> {
                 counter.incrementAndGet();

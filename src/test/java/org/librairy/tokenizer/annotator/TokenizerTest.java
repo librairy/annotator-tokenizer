@@ -2,7 +2,9 @@ package org.librairy.tokenizer.annotator;
 
 
 import edu.stanford.nlp.pipeline.Annotation;
+import es.cbadenes.lab.test.IntegrationTest;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.librairy.tokenizer.Config;
 import org.librairy.tokenizer.annotator.stanford.StanfordEntityTokenizer;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
+@Category(IntegrationTest.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Config.class)
 public class TokenizerTest {
