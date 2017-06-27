@@ -1,31 +1,21 @@
 package org.librairy.tokenizer.annotator;
 
 import com.google.common.collect.ImmutableMap;
-import com.sun.jndi.toolkit.url.Uri;
 import es.cbadenes.lab.test.IntegrationTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.librairy.boot.model.Annotation;
-import org.librairy.boot.model.Event;
 import org.librairy.boot.model.domain.resources.Item;
-import org.librairy.boot.model.domain.resources.Resource;
-import org.librairy.boot.model.modules.EventBus;
-import org.librairy.boot.model.modules.RoutingKey;
-import org.librairy.boot.storage.UDM;
 import org.librairy.boot.storage.dao.AnnotationsDao;
 import org.librairy.boot.storage.dao.DomainsDao;
 import org.librairy.boot.storage.dao.ItemsDao;
 import org.librairy.boot.storage.exception.DataNotFound;
 import org.librairy.boot.storage.generator.URIGenerator;
 import org.librairy.tokenizer.Application;
-import org.librairy.tokenizer.service.ItemService;
-import org.librairy.tokenizer.service.PartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
@@ -76,61 +66,61 @@ public class TagAnnotatorTest {
     @Test
     public void updateTags() throws DataNotFound {
 
-        String domainUri = "http://librairy.linkeddata.es/resources/domains/patents";
-
-        Optional<String> id = Optional.empty();
-        Boolean finished = false;
-        Integer windowSize = 500;
-        Integer round = 1;
-        AtomicInteger counter = new AtomicInteger(0);
-        while(!finished){
-
-            LOG.info(round++ + " round!  total docs: " + counter.get());
-            List<Item> items = domainsDao.listDocuments(domainUri, windowSize, id, false);
-
-            items.parallelStream().forEach( item -> {
-                counter.incrementAndGet();
-                try {
-                    List<Annotation> annotations = annotationsDao.list(item.getUri(), false);
-
-                    if (annotations.stream().filter(a -> a.getType().equalsIgnoreCase("tags")).count() < 1){
-                        LOG.info("Annotating item: " + item.getUri());
-                        Annotation ner = null;
-                        ner = annotationsDao.get(item.getUri(), "ner");
-                        Annotation compound = annotationsDao.get(item.getUri(), "compound");
-                        Map map = ImmutableMap.of("compound", new StringBuilder(compound.getValue()), "ner", new StringBuilder(ner.getValue()));
-
-                        // Annotate Tags
-                        annotationsDao.saveOrUpdate(item.getUri(), "tags", annotator.annotate(map, Language.from(item.getLanguage())));
-                    }
-
-                } catch (DataNotFound dataNotFound) {
-                    dataNotFound.printStackTrace();
-                }
-
-            });
-
-            if (items.size() < windowSize) {
-                LOG.info("Completed!");
-                return;
-            }
-
-            String offset = URIGenerator.retrieveId(items.get(items.size()-1).getUri());
-            LOG.info("New offset: " + offset);
-            id = Optional.of(offset);
-
-        }
+//        String domainUri = "http://librairy.linkeddata.es/resources/domains/patents";
+//
+//        Optional<String> id = Optional.empty();
+//        Boolean finished = false;
+//        Integer windowSize = 500;
+//        Integer round = 1;
+//        AtomicInteger counter = new AtomicInteger(0);
+//        while(!finished){
+//
+//            LOG.info(round++ + " round!  total docs: " + counter.get());
+//            List<Item> items = domainsDao.listDocuments(domainUri, windowSize, id, false);
+//
+//            items.parallelStream().forEach( item -> {
+//                counter.incrementAndGet();
+//                try {
+//                    List<Annotation> annotations = annotationsDao.list(item.getUri(), false);
+//
+//                    if (annotations.stream().filter(a -> a.getType().equalsIgnoreCase("tags")).count() < 1){
+//                        LOG.info("Annotating item: " + item.getUri());
+//                        Annotation ner = null;
+//                        ner = annotationsDao.get(item.getUri(), "ner");
+//                        Annotation compound = annotationsDao.get(item.getUri(), "compound");
+//                        Map map = ImmutableMap.of("compound", new StringBuilder(compound.getValue()), "ner", new StringBuilder(ner.getValue()));
+//
+//                        // Annotate Tags
+//                        annotationsDao.saveOrUpdate(item.getUri(), "tags", annotator.annotate(map, Language.from(item.getLanguage())));
+//                    }
+//
+//                } catch (DataNotFound dataNotFound) {
+//                    dataNotFound.printStackTrace();
+//                }
+//
+//            });
+//
+//            if (items.size() < windowSize) {
+//                LOG.info("Completed!");
+//                return;
+//            }
+//
+//            String offset = URIGenerator.retrieveId(items.get(items.size()-1).getUri());
+//            LOG.info("New offset: " + offset);
+//            id = Optional.of(offset);
+//
+//        }
 
     }
 
     @Test
     public void getAnnotations(){
 
-        String uri = "http://librairy.linkeddata.es/resources/items/US7162549";
-        List<Annotation> annotations = annotationsDao.list(uri, false);
-        System.out.println(annotations);
-        Boolean res = annotations.stream().filter(a -> a.getType().equalsIgnoreCase("tags")).count() < 1;
-        System.out.println("Boolean: " + res);
+//        String uri = "http://librairy.linkeddata.es/resources/items/US7162549";
+//        List<Annotation> annotations = annotationsDao.list(uri, false);
+//        System.out.println(annotations);
+//        Boolean res = annotations.stream().filter(a -> a.getType().equalsIgnoreCase("tags")).count() < 1;
+//        System.out.println("Boolean: " + res);
 
     }
 

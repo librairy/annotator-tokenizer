@@ -56,7 +56,7 @@ public class Application {
             ConfigurableApplicationContext context = SpringApplication.run(Application
                     .class, args);
 
-            LOG.info("Listening on port: " + port);
+            LOG.info(" ٩(͡๏̯͡๏)۶ librairy tokenizer is up and running!!");
 
         } catch (Exception e) {
             LOG.error("Error executing test",e);

@@ -1,17 +1,13 @@
+                      ┬  ┬┌┐ ┬─┐╔═╗╦┬─┐┬ ┬
+                      │  │├┴┐├┬┘╠═╣║├┬┘└┬┘
+                      ┴─┘┴└─┘┴└─╩ ╩╩┴└─ ┴
+    ╔═╗┌┐┌┌┐┌┌─┐┌┬┐┌─┐┌┬┐┌─┐┬─┐  ╔╦╗┌─┐┬┌─┌─┐┌┐┌┬┌─┐┌─┐┬─┐
+    ╠═╣│││││││ │ │ ├─┤ │ │ │├┬┘   ║ │ │├┴┐├┤ ││││┌─┘├┤ ├┬┘
+    ╩ ╩┘└┘┘└┘└─┘ ┴ ┴ ┴ ┴ └─┘┴└─   ╩ └─┘┴ ┴└─┘┘└┘┴└─┘└─┘┴└─
 
-  oydMo     smh`  /shNm                                          .//`
-  ``dMo     /yo   ``+Mm                                          `:-`
-    dMo             /Mm
-    dMo   :+ydh     /Mm:oyhdmdo.   .+sdm`/ydmd/  `-:::::/:.    `--//   `/ohm--sdmmyshhhys.  /shhy+
-    dMo   .-sMd     /MN+.   `+NM+  `-:MMh+.`/+. `++.    `/+-   ``.++   `--NMdo-`:+: .mMs     `Ns
-    dMo     oMd     /Mm       +MM.   .MM.       `-.    ``/+:     `++      NM/        .NM+    dy
-    dMo     oMd     /Mm       -MM:   .MM.        .::::--./+:     `++      NM/         -NM:  yd
-    dMo     oMd     /Mm       sMN`   .MM.      `/+-      :+:     `++      NM/          :MN-om`
-   `mMy     sMm`    /Mmy:` `:yMd.    :MM:      `++:` `.-:/+:     .++`    .NMo           :MNm.
-  ssssss+ +ssssss`  -s`.+yhhyo-    :ssssss:      .::::-`  .::-..------`.ssssss/          sN-
-                                                                                        -N:
-                                                                                  +Nh:-+m:
-                                                                                  `/sso:
+                        cbadenes@fi.upm.es
+                         ocorcho@fi.upm.es
 
-
-
+                     Ontology Engineering Group
+                 Universidad Politecnica de Madrid
+                               2017

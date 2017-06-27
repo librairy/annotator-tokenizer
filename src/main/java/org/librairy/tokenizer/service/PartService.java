@@ -1,6 +1,7 @@
 package org.librairy.tokenizer.service;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import edu.stanford.nlp.pipeline.Annotation;
 import org.librairy.boot.model.Event;
 import org.librairy.boot.model.domain.resources.Domain;
@@ -135,7 +136,17 @@ public class PartService {
 
             // Annotate
             tokenMap.entrySet().parallelStream().forEach(entry -> {
-                annotationsDao.saveOrUpdate(part.getUri(), entry.getKey(), entry.getValue().toString());
+
+                org.librairy.boot.model.domain.resources.Annotation annotation = new org.librairy.boot.model.domain.resources.Annotation();
+                annotation.setPurpose(entry.getKey());
+                annotation.setType(entry.getKey());
+                annotation.setResource(part.getUri());
+                annotation.setCreator("tokenizer");
+                annotation.setValue(ImmutableMap.of("content", entry.getValue().toString()));
+                annotation.setScore(1.0);
+                annotation.setFormat("text/plain");
+                annotation.setLanguage("en");
+                udm.save(annotation);
             });
 
             Instant end = Instant.now();

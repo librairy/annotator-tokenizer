@@ -16,8 +16,6 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */

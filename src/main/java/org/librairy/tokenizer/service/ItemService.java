@@ -1,6 +1,7 @@
 package org.librairy.tokenizer.service;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import edu.stanford.nlp.pipeline.Annotation;
 import org.librairy.boot.model.domain.resources.Domain;
 import org.librairy.boot.model.domain.resources.Item;
@@ -130,12 +131,30 @@ public class ItemService {
 
             // Annotate
             tokenMap.entrySet().parallelStream().forEach(entry -> {
-                annotationsDao.saveOrUpdate(item.getUri(), entry.getKey(), entry.getValue().toString());
+
+                org.librairy.boot.model.domain.resources.Annotation annotation = new org.librairy.boot.model.domain.resources.Annotation();
+                annotation.setPurpose(entry.getKey());
+                annotation.setType(entry.getKey());
+                annotation.setResource(item.getUri());
+                annotation.setCreator("tokenizer");
+                annotation.setValue(ImmutableMap.of("content", entry.getValue().toString()));
+                annotation.setScore(1.0);
+                annotation.setFormat("text/plain");
+                annotation.setLanguage("en");
+                udm.save(annotation);
             });
 
             // Annotate Tags
-            annotationsDao.saveOrUpdate(item.getUri(), "tags", tagAnnotator.annotate(tokenMap, Language.from(item.getLanguage())));
-
+            org.librairy.boot.model.domain.resources.Annotation annotation = new org.librairy.boot.model.domain.resources.Annotation();
+            annotation.setPurpose("tags");
+            annotation.setType("tags");
+            annotation.setResource(item.getUri());
+            annotation.setCreator("tokenizer");
+            annotation.setValue(ImmutableMap.of("content", tagAnnotator.annotate(tokenMap, Language.from(item.getLanguage()))));
+            annotation.setScore(1.0);
+            annotation.setFormat("text/plain");
+            annotation.setLanguage("en");
+            udm.save(annotation);
 
 
             Instant end = Instant.now();

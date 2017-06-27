@@ -1,6 +1,7 @@
 package org.librairy.tokenizer.annotator.stanford;
 
 
+import com.google.common.collect.ImmutableMap;
 import edu.stanford.nlp.pipeline.Annotation;
 import es.cbadenes.lab.test.IntegrationTest;
 import org.junit.Test;
@@ -105,7 +106,12 @@ public class StanfordEntityTokenizerTest {
 
             LOG.info(tokens);
 
-            annotationsDao.saveOrUpdate(uri,type,tokens);
+            org.librairy.boot.model.domain.resources.Annotation annotation = new org.librairy.boot.model.domain.resources.Annotation();
+            annotation.setType(type);
+            annotation.setPurpose(type);
+            annotation.setResource(uri);
+            annotation.setValue(ImmutableMap.of("content", tokens));
+            udm.save(annotation);
             LOG.info("Saved successfully!");
 
             Instant endAnnotation = Instant.now();
