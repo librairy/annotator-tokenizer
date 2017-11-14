@@ -18,7 +18,7 @@ import java.util.Properties;
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
-@Component
+//@Component
 public class StanfordAnnotatorES {
 
     /**
@@ -282,6 +282,8 @@ public class StanfordAnnotatorES {
         // Parallel
         //props.put("threads", "8");
         pipeline = new StanfordCoreNLP(props);
+
+        LOG.info("Stanford Annotator ES ready");
     }
 
     public Annotation annotate(String text){

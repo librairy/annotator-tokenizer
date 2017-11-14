@@ -37,7 +37,7 @@ import java.util.stream.StreamSupport;
 /**
  * Created by cbadenes on 07/01/16.
  */
-@Component
+//@Component
 public class StanfordCompoundTokenizer {
 
     private static final Logger LOG = LoggerFactory.getLogger(StanfordCompoundTokenizer.class);

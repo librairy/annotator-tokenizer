@@ -11,7 +11,7 @@
 
 	<groupId>org.librairy</groupId>
     <artifactId>librairy-annotator-tokenizer</artifactId>
-    <version>1.8.0</version>
+    <version>1.8.5.2</version>
     <packaging>jar</packaging>
     <name>annotator-tokenizer</name>
     <description>retrieve tokens from textual content</description>
@@ -87,7 +87,7 @@
         <maven.compiler.plugin.version>3.3</maven.compiler.plugin.version>
 
         <coreNlpExtensions.version>1.0</coreNlpExtensions.version>
-        <librairy.boot.version>1.8.0</librairy.boot.version>
+        <librairy.boot.version>1.8.5.2</librairy.boot.version>
         <lucene.version>4.10.4</lucene.version>
         <junit.version>4.12</junit.version>
         <stanford.version>3.5.2</stanford.version><!-- 3.6.0 -->

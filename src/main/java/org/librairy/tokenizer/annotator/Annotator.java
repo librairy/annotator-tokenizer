@@ -22,16 +22,16 @@ public class Annotator {
     @Autowired
     StanfordAnnotatorEN annotatorEN;
 
-    @Autowired
-    StanfordAnnotatorES annotatorES;
+//    @Autowired
+//    StanfordAnnotatorES annotatorES;
 
     public Annotation annotate(String text, Language lang){
         Annotation annotation;
         switch(lang){
             case EN: annotation =  annotatorEN.annotate(text);
                 break;
-            case ES: annotation = annotatorES.annotate(text);
-                break;
+//            case ES: annotation = annotatorES.annotate(text);
+//                break;
             default: throw new RuntimeException("No language handled: " + lang);
         }
         return annotation;

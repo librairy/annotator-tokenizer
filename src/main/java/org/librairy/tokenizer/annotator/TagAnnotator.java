@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
-@Component
+//@Component
 public class TagAnnotator {
 
     @Autowired

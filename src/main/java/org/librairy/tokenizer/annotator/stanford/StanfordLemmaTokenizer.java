@@ -34,7 +34,8 @@ public class StanfordLemmaTokenizer{
                     Token token = new Token();
                     token.setPos(coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class).toLowerCase());
                     token.setWord(coreLabel.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase());
-                    token.setStopWord(coreLabel.get(StopWordAnnotatorWrapper.class).first);
+                    //token.setStopWord(coreLabel.get(StopWordAnnotatorWrapper.class).first);
+                    token.setStopWord(false);
                     return token;
                 })
                 .collect(Collectors.toList());

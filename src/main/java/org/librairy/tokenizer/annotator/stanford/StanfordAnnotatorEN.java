@@ -100,7 +100,7 @@ public class StanfordAnnotatorEN {
         props = new Properties();
         //props.put("annotators", "tokenize, cleanxml, ssplit, pos, lemma, stopword"); //"tokenize, ssplit, pos, lemma, ner, parse, dcoref"
         //props.put("annotators", "tokenize, ssplit, pos, lemma, stopword, ner"); //"tokenize, ssplit, pos,
-        props.put("annotators", "tokenize, ssplit, pos, lemma, stopword, ner"); //"tokenize, ssplit, pos,
+        props.put("annotators", "tokenize, ssplit, pos, lemma"); //"tokenize, ssplit, pos,
 
         // Max length
         props.setProperty("parse.maxlen","100");
@@ -126,6 +126,8 @@ public class StanfordAnnotatorEN {
         // Parallel
         //props.put("threads", "8");
         pipeline = new StanfordCoreNLP(props);
+
+        LOG.info("Stanford Annotator EN ready");
     }
 
     public Annotation annotate(String text){

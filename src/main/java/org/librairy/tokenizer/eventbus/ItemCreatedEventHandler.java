@@ -6,10 +6,12 @@ import org.librairy.boot.model.modules.BindingKey;
 import org.librairy.boot.model.modules.EventBus;
 import org.librairy.boot.model.modules.EventBusSubscriber;
 import org.librairy.boot.model.modules.RoutingKey;
+import org.librairy.boot.storage.system.column.ColumnConfig;
 import org.librairy.tokenizer.service.ItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -18,6 +20,7 @@ import javax.annotation.PostConstruct;
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
 @Component
+@DependsOn("dbChecker")
 public class ItemCreatedEventHandler implements EventBusSubscriber {
 
     private static final Logger LOG = LoggerFactory.getLogger(ItemCreatedEventHandler.class);

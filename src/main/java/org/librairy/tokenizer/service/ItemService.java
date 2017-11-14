@@ -50,8 +50,8 @@ public class ItemService {
     @Autowired
     Worker worker;
 
-    @Autowired
-    TagAnnotator tagAnnotator;
+//    @Autowired
+//    TagAnnotator tagAnnotator;
 
     @Autowired
     DomainsDao domainsDao;
@@ -66,6 +66,7 @@ public class ItemService {
     public void handle(String itemUri){
 
         try{
+            Instant start = Instant.now();
             Optional<Resource> optResource = udm.read(Resource.Type.ITEM).byUri(itemUri);
 
             if (!optResource.isPresent()){
@@ -75,7 +76,7 @@ public class ItemService {
 
             Item item = optResource.get().asItem();
 
-            LOG.info("Parsing '" + item.getUri() + "' ...");
+            LOG.debug("Parsing '" + item.getUri() + "' ...");
 
             String content = item.getContent();
 
@@ -85,7 +86,7 @@ public class ItemService {
             }
 
 
-            Instant start = Instant.now();
+
 
             Matcher matcher = Pattern.compile(".{1,1000}(,|.$)").matcher(content);
             Map<String,StringBuilder> tokenMap = new HashMap<String,StringBuilder>();
@@ -100,7 +101,7 @@ public class ItemService {
                         ChronoUnit.MINUTES.between(startAnnotation,endAnnotation) + "min " +
                         (ChronoUnit.SECONDS.between(startAnnotation,endAnnotation)%60) + "secs");
 
-                tokenizers.parallelStream().forEach(tokenizer -> {
+                tokenizers.stream().forEach(tokenizer -> {
                     try{
                         Instant startTokenizer = Instant.now();
                         List<Token> tokenList = tokenizer.tokenize(annotation);
@@ -130,7 +131,7 @@ public class ItemService {
             }
 
             // Annotate
-            tokenMap.entrySet().parallelStream().forEach(entry -> {
+            tokenMap.entrySet().stream().forEach(entry -> {
 
                 org.librairy.boot.model.domain.resources.Annotation annotation = new org.librairy.boot.model.domain.resources.Annotation();
                 annotation.setPurpose(entry.getKey());
@@ -141,42 +142,43 @@ public class ItemService {
                 annotation.setScore(1.0);
                 annotation.setFormat("text/plain");
                 annotation.setLanguage("en");
-                udm.save(annotation);
+                annotationsDao.save(annotation);
+//                udm.save(annotation);
             });
 
             // Annotate Tags
-            org.librairy.boot.model.domain.resources.Annotation annotation = new org.librairy.boot.model.domain.resources.Annotation();
-            annotation.setPurpose("tags");
-            annotation.setType("tags");
-            annotation.setResource(item.getUri());
-            annotation.setCreator("tokenizer");
-            annotation.setValue(ImmutableMap.of("content", tagAnnotator.annotate(tokenMap, Language.from(item.getLanguage()))));
-            annotation.setScore(1.0);
-            annotation.setFormat("text/plain");
-            annotation.setLanguage("en");
-            udm.save(annotation);
+//            org.librairy.boot.model.domain.resources.Annotation annotation = new org.librairy.boot.model.domain.resources.Annotation();
+//            annotation.setPurpose("tags");
+//            annotation.setType("tags");
+//            annotation.setResource(item.getUri());
+//            annotation.setCreator("tokenizer");
+//            annotation.setValue(ImmutableMap.of("content", tagAnnotator.annotate(tokenMap, Language.from(item.getLanguage()))));
+//            annotation.setScore(1.0);
+//            annotation.setFormat("text/plain");
+//            annotation.setLanguage("en");
+//            udm.save(annotation);
 
 
             Instant end = Instant.now();
             LOG.info("Annotated '" + itemUri + "'  in: " + ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
 
 
-            Integer windowSize = 100;
-            Optional<String> offset = Optional.empty();
-            Boolean finished = false;
-
-            while(!finished){
-                List<Domain> domains = itemsDao.listDomains(item.getUri(), windowSize, offset, false);
-
-                for (Domain domain: domains){
-                    domainsDao.updateDomainTokens(domain.getUri(), item.getUri());
-                }
-
-                if (domains.size() < windowSize) break;
-
-                offset = Optional.of(URIGenerator.retrieveId(domains.get(windowSize-1).getUri()));
-
-            }
+//            Integer windowSize = 100;
+//            Optional<String> offset = Optional.empty();
+//            Boolean finished = false;
+//
+//            while(!finished){
+//                List<Domain> domains = itemsDao.listDomains(item.getUri(), windowSize, offset, false);
+//
+//                for (Domain domain: domains){
+//                    domainsDao.updateDomainTokens(domain.getUri(), item.getUri(), item.getDescription());
+//                }
+//
+//                if (domains.size() < windowSize) break;
+//
+//                offset = Optional.of(URIGenerator.retrieveId(domains.get(windowSize-1).getUri()));
+//
+//            }
 
         }catch (Exception e){
             LOG.warn("Unexpected error",e);

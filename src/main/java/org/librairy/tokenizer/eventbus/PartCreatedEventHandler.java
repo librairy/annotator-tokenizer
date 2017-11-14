@@ -10,6 +10,7 @@ import org.librairy.tokenizer.service.PartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
  * @author Badenes Olmedo, Carlos <cbadenes@fi.upm.es>
  */
 @Component
+@DependsOn("dbChecker")
 public class PartCreatedEventHandler implements EventBusSubscriber {
 
     private static final Logger LOG = LoggerFactory.getLogger(PartCreatedEventHandler.class);

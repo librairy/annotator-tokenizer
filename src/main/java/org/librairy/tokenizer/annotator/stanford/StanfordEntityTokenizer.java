@@ -28,7 +28,7 @@ import java.util.stream.StreamSupport;
 /**
  * Created by cbadenes on 07/01/16.
  */
-@Component
+//@Component
 public class StanfordEntityTokenizer {
 
 	

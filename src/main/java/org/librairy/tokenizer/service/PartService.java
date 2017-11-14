@@ -79,7 +79,7 @@ public class PartService {
         try{
             Part part = optResource.get().asPart();
 
-            LOG.info("Parsing '" + partUri + "' ...");
+            LOG.debug("Parsing '" + partUri + "' ...");
 
 
             String content = part.getContent();
@@ -105,7 +105,7 @@ public class PartService {
                         ChronoUnit.MINUTES.between(startAnnotation,endAnnotation) + "min " +
                         (ChronoUnit.SECONDS.between(startAnnotation,endAnnotation)%60) + "secs");
 
-                tokenizers.parallelStream().forEach(tokenizer -> {
+                tokenizers.stream().forEach(tokenizer -> {
                     try{
                         Instant startTokenizer = Instant.now();
                         List<Token> tokenList = tokenizer.tokenize(annotation);
@@ -135,7 +135,7 @@ public class PartService {
             }
 
             // Annotate
-            tokenMap.entrySet().parallelStream().forEach(entry -> {
+            tokenMap.entrySet().stream().forEach(entry -> {
 
                 org.librairy.boot.model.domain.resources.Annotation annotation = new org.librairy.boot.model.domain.resources.Annotation();
                 annotation.setPurpose(entry.getKey());
@@ -146,28 +146,29 @@ public class PartService {
                 annotation.setScore(1.0);
                 annotation.setFormat("text/plain");
                 annotation.setLanguage("en");
-                udm.save(annotation);
+                annotationsDao.save(annotation);
+//                udm.save(annotation);
             });
 
             Instant end = Instant.now();
             LOG.info("Annotated '" + partUri + "'  in: " + ChronoUnit.MINUTES.between(start,end) + "min " + (ChronoUnit.SECONDS.between(start,end)%60) + "secs");
 
-            Integer windowSize = 100;
-            Optional<String> offset = Optional.empty();
-            Boolean finished = false;
-
-            while(!finished){
-                List<Domain> domains = partsDao.listDomains(part.getUri(), windowSize, offset);
-
-                for (Domain domain: domains){
-                    domainsDao.updateDomainTokens(domain.getUri(), part.getUri());
-                }
-
-                if (domains.size() < windowSize) break;
-
-                offset = Optional.of(URIGenerator.retrieveId(domains.get(windowSize-1).getUri()));
-
-            }
+//            Integer windowSize = 100;
+//            Optional<String> offset = Optional.empty();
+//            Boolean finished = false;
+//
+//            while(!finished){
+//                List<Domain> domains = partsDao.listDomains(part.getUri(), windowSize, offset);
+//
+//                for (Domain domain: domains){
+//                    domainsDao.updateDomainTokens(domain.getUri(), part.getUri(), part.getSense());
+//                }
+//
+//                if (domains.size() < windowSize) break;
+//
+//                offset = Optional.of(URIGenerator.retrieveId(domains.get(windowSize-1).getUri()));
+//
+//            }
 
 
         }catch (Exception e){
